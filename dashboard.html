@@ -1,0 +1,31 @@
+<div class="grid-menu">
+    <div class="menu-card" @click="setView('input', 'Input Arsip')">
+        <div class="card-icon bg-purple">
+            <i data-lucide="file-up"></i>
+        </div>
+        <h3>Input Arsip</h3>
+        <p style="color: var(--text-light); font-size: 0.9rem; margin-top: 8px;">
+            Unggah dokumen PDF baru ke dalam sistem arsip digital.
+        </p>
+    </div>
+
+    <div class="menu-card" @click="setView('search', 'Cari Arsip')">
+        <div class="card-icon bg-blue">
+            <i data-lucide="search"></i>
+        </div>
+        <h3>Cari Arsip</h3>
+        <p style="color: var(--text-light); font-size: 0.9rem; margin-top: 8px;">
+            Cari, lihat, unduh, dan cetak dokumen yang sudah tersimpan.
+        </p>
+    </div>
+
+    <div class="menu-card" @click="setView('settings', 'Pengaturan')">
+        <div class="card-icon bg-pink">
+            <i data-lucide="settings-2"></i>
+        </div>
+        <h3>Pengaturan</h3>
+        <p style="color: var(--text-light); font-size: 0.9rem; margin-top: 8px;">
+            Kelola profil desa, ubah PIN, dan perbarui kata sandi.
+        </p>
+    </div>
+</div>

@@ -1,0 +1,82 @@
+<div>
+    <div class="search-box">
+        <div style="flex: 1; position: relative;">
+            <i data-lucide="search" style="position: absolute; left: 16px; top: 14px; color: var(--text-light); width: 20px;"></i>
+            <input type="text" class="form-input" style="padding-left: 48px;" 
+                   x-model="searchQuery" @input.debounce.500ms="handleSearch"
+                   placeholder="Cari Nomor atau Nama Pemilik...">
+        </div>
+        <button class="btn btn-primary" style="width: auto; padding: 0 24px;" @click="handleSearch">CARI</button>
+    </div>
+
+    <div class="data-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>No. Arsip</th>
+                    <th>Nama Pemilik</th>
+                    <th>Jenis</th>
+                    <th>Tanggal Simpan</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template x-if="searchResults.length === 0">
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 48px; color: var(--text-light);">
+                            <i data-lucide="info" style="margin-bottom: 12px; opacity: 0.5;"></i><br>
+                            Data tidak ditemukan atau belum ada data.
+                        </td>
+                    </tr>
+                </template>
+                <template x-for="item in searchResults" :key="item.id">
+                    <tr>
+                        <td style="font-weight: 600;" x-text="item.nomor"></td>
+                        <td x-text="item.namaPemilik"></td>
+                        <td>
+                            <span :class="'badge ' + (item.jenis === 'Masuk' ? 'bg-blue' : 'bg-purple')" x-text="item.jenis"></span>
+                        </td>
+                        <td x-text="formatDate(item.timestamp)"></td>
+                        <td>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="action-btn" title="Preview" @click="window.open(item.viewUrl, '_blank')">
+                                    <i data-lucide="eye"></i>
+                                </button>
+                                <button class="action-btn" title="Edit Nama" @click="handleEditName(item)">
+                                    <i data-lucide="edit-3"></i>
+                                </button>
+                                <button class="action-btn" title="Download" @click="window.open(item.downloadUrl, '_blank')">
+                                    <i data-lucide="download"></i>
+                                </button>
+                                <button class="action-btn" title="Print" @click="handlePrint(item)">
+                                    <i data-lucide="printer"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+.action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-light);
+}
+.action-btn:hover {
+    background: #f1f5f9;
+    color: var(--primary);
+    border-color: var(--primary);
+}
+</style>

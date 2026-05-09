@@ -1,0 +1,42 @@
+<aside class="sidebar">
+    <div class="logo">
+        <i data-lucide="archive"></i> E-ARSIP
+    </div>
+    
+    <nav class="nav-menu" x-data="{ openSettings: false }">
+        <div class="nav-item" :class="view === 'menu' ? 'active' : ''" @click="setView('menu', 'Menu Utama')">
+            <i data-lucide="layout-grid"></i> Menu Utama
+        </div>
+        <div class="nav-item" :class="view === 'input' ? 'active' : ''" @click="setView('input', 'Input Arsip')">
+            <i data-lucide="file-plus"></i> Input Arsip
+        </div>
+        <div class="nav-item" :class="view === 'search' ? 'active' : ''" @click="setView('search', 'Cari Arsip')">
+            <i data-lucide="search"></i> Cari Arsip
+        </div>
+        
+        <!-- Dropdown Master Menu -->
+        <div class="nav-item-dropdown">
+            <div class="nav-item" :class="view.startsWith('settings') ? 'active' : ''" @click="openSettings = !openSettings">
+                <i data-lucide="settings"></i> Pengaturan
+                <i data-lucide="chevron-down" style="margin-left: auto; transition: transform 0.3s;" :style="openSettings ? 'transform: rotate(180deg)' : ''"></i>
+            </div>
+            <div x-show="openSettings" x-transition class="dropdown-content">
+                <div class="nav-item sub-item" :class="view === 'settings-profile' ? 'active' : ''" @click="setView('settings-profile', 'Profil Desa')">
+                    Profil Desa
+                </div>
+                <div class="nav-item sub-item" :class="view === 'settings-pin' ? 'active' : ''" @click="setView('settings-pin', 'Ubah PIN')">
+                    Ubah PIN
+                </div>
+                <div class="nav-item sub-item" :class="view === 'settings-pass' ? 'active' : ''" @click="setView('settings-pass', 'Ubah Password')">
+                    Ubah Password
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <div style="margin-top: auto;">
+        <div class="nav-item" @click="logout()" style="color: var(--error);">
+            <i data-lucide="log-out"></i> Logout
+        </div>
+    </div>
+</aside>

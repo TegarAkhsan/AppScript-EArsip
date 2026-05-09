@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Arsip Digital</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <?!= include('style'); ?>
+</head>
+<body x-data="app()" x-init="init()">
+    
+    <!-- Loading Overlay -->
+    <div x-show="loading" class="loading-overlay" x-transition>
+        <div class="loader"></div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" x-show="toast.show" x-transition>
+        <div :class="'toast toast-' + toast.type">
+            <span x-text="toast.message"></span>
+        </div>
+    </div>
+
+    <main class="app-container">
+        <!-- Auth Views -->
+        <template x-if="!isLoggedIn || !isPinVerified">
+            <?!= include('auth'); ?>
+        </template>
+
+        <!-- Main Dashboard -->
+        <template x-if="isLoggedIn && isPinVerified">
+            <div class="dashboard-layout">
+                <?!= include('sidebar'); ?>
+                <div class="content-area">
+                    <header class="top-nav">
+                        <div class="page-title">
+                            <h2 x-text="currentPageTitle"></h2>
+                        </div>
+                        <div class="user-profile-small">
+                            <img :src="'https://ui-avatars.com/api/?name=' + user.email + '&background=6366f1&color=fff'" alt="Avatar">
+                        </div>
+                    </header>
+                    
+                    <div class="view-container">
+                        <div x-show="view === 'menu'" x-transition><?!= include('dashboard'); ?></div>
+                        <div x-show="view === 'input'" x-transition><?!= include('input_arsip'); ?></div>
+                        <div x-show="view === 'search'" x-transition><?!= include('arsip'); ?></div>
+                        <div x-show="view.startsWith('settings')" x-transition><?!= include('settings'); ?></div>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </main>
+
+    <?!= include('script'); ?>
+</body>
+</html>

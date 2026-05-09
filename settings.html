@@ -1,0 +1,64 @@
+<div style="max-width: 800px; margin: 0 auto;">
+    <!-- Profile Info -->
+    <div class="flat-card" x-show="view === 'settings-profile'" x-transition style="width: 100%; max-width: none;">
+        <div class="auth-header" style="text-align: left;">
+            <h3>Profil Desa</h3>
+            <p>Informasi dasar sistem</p>
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="text" class="form-input" :value="user.email" readonly style="background: #f8fafc;">
+        </div>
+        <div class="form-group">
+            <label>Nama Desa</label>
+            <input type="text" class="form-input" x-model="settingsForm.namaDesa">
+        </div>
+        <div class="form-group">
+            <label>Alamat Desa</label>
+            <textarea class="form-input" x-model="settingsForm.alamatDesa" rows="3"></textarea>
+        </div>
+        <button class="btn btn-primary" @click="handleUpdateProfile">SIMPAN PERUBAHAN</button>
+    </div>
+
+    <!-- Change PIN -->
+    <div class="flat-card" x-show="view === 'settings-pin'" x-transition style="width: 100%; max-width: none;">
+        <div class="auth-header" style="text-align: left;">
+            <h3>Ubah PIN</h3>
+            <p>Amankan akses dengan PIN baru</p>
+        </div>
+        <div class="form-group">
+            <label>PIN Lama</label>
+            <input type="password" class="form-input" x-model="securityForm.oldPin" maxlength="6">
+        </div>
+        <div class="form-group">
+            <label>PIN Baru</label>
+            <input type="password" class="form-input" x-model="securityForm.newPin" maxlength="6">
+        </div>
+        <div class="form-group">
+            <label>Konfirmasi PIN Baru</label>
+            <input type="password" class="form-input" x-model="securityForm.confirmPin" maxlength="6">
+        </div>
+        <button class="btn btn-primary" @click="handleChangePin">UPDATE PIN</button>
+    </div>
+
+    <!-- Change Password -->
+    <div class="flat-card" x-show="view === 'settings-pass'" x-transition style="width: 100%; max-width: none;">
+        <div class="auth-header" style="text-align: left;">
+            <h3>Ubah Password</h3>
+            <p>Perbarui kredensial login Anda</p>
+        </div>
+        <div class="form-group">
+            <label>Password Lama</label>
+            <input type="password" class="form-input" x-model="securityForm.oldPass">
+        </div>
+        <div class="form-group">
+            <label>Password Baru</label>
+            <input type="password" class="form-input" x-model="securityForm.newPass">
+        </div>
+        <div class="form-group">
+            <label>Konfirmasi Password Baru</label>
+            <input type="password" class="form-input" x-model="securityForm.confirmPass">
+        </div>
+        <button class="btn btn-primary" @click="handleChangePassword">UPDATE PASSWORD</button>
+    </div>
+</div>

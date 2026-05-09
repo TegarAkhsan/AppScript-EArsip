@@ -1,0 +1,40 @@
+<div class="flat-card" style="max-width: 800px; margin: 0 auto;">
+    <div class="auth-header" style="text-align: left; margin-bottom: 32px;">
+        <h2>Input Dokumen</h2>
+        <p>Lengkapi detail dokumen untuk diarsipkan</p>
+    </div>
+
+    <form @submit.prevent="handleUpload">
+        <div class="form-group">
+            <label>Jenis Dokumen</label>
+            <div style="display: flex; gap: 16px; margin-top: 8px;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="radio" x-model="uploadForm.jenis" value="Masuk" required> Surat Masuk
+                </label>
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <input type="radio" x-model="uploadForm.jenis" value="Keluar" required> Surat Keluar
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Nomor Dokumen / Surat</label>
+            <input type="text" class="form-input" x-model="uploadForm.nomor" required placeholder="Contoh: 001/DS/2026">
+        </div>
+        <div class="form-group">
+            <label>Nama Pemilik / Subjek</label>
+            <input type="text" class="form-input" x-model="uploadForm.namaPemilik" required placeholder="Masukkan nama pemilik dokumen">
+        </div>
+        <div class="form-group">
+            <label>Pilih File (PDF)</label>
+            <input type="file" id="file-upload" class="form-input" accept="application/pdf" @change="handleFileSelect" required>
+            <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 4px;" x-text="uploadForm.fileName ? 'Terpilih: ' + uploadForm.fileName : 'Maksimal 10MB'"></p>
+        </div>
+        
+        <div style="display: flex; gap: 12px; margin-top: 32px;">
+            <button type="submit" class="btn btn-primary" :disabled="loading">
+                <i data-lucide="save"></i> SIMPAN KE SISTEM
+            </button>
+            <button type="button" @click="setView('menu', 'Menu Utama')" class="btn btn-ghost">BATAL</button>
+        </div>
+    </form>
+</div>
