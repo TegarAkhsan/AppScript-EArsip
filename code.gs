@@ -208,7 +208,7 @@ function searchArsip(query) {
       if (!q || nomor.toLowerCase().includes(q) || nama.toLowerCase().includes(q) || jenis.toLowerCase().includes(q)) {
         results.push({
           id: row[0].toString(),
-          timestamp: row[1],
+          timestamp: row[1] instanceof Date ? row[1].toISOString() : row[1].toString(),
           nomor: nomor || '-',
           namaPemilik: nama || '-',
           jenis: jenis || '-',
@@ -298,7 +298,12 @@ function changePassword(email, oldPass, newPass) {
  * HELPERS
  */
 function getFolder() {
-  if (CONFIG.FOLDER_ID) return DriveApp.getFolderById(CONFIG.FOLDER_ID);
+  const folders = DriveApp.getFoldersByName('E-Arsip-Uploads');
+  if (folders.hasNext()) return folders.next();
+  return DriveApp.createFolder('E-Arsip-Uploads');
+}
+
+function getFolder() {
   const folders = DriveApp.getFoldersByName('E-Arsip-Uploads');
   if (folders.hasNext()) return folders.next();
   return DriveApp.createFolder('E-Arsip-Uploads');

@@ -1,7 +1,7 @@
 <div class="grid-menu">
     <div class="menu-card" @click="setView('input', 'Input Arsip')">
         <div class="card-icon bg-purple">
-            <i data-lucide="file-up"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
         </div>
         <h3>Input Arsip</h3>
         <p style="color: var(--text-light); font-size: 0.9rem; margin-top: 8px;">
@@ -11,7 +11,7 @@
 
     <div class="menu-card" @click="setView('search', 'Cari Arsip')">
         <div class="card-icon bg-blue">
-            <i data-lucide="search"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
         </div>
         <h3>Cari Arsip</h3>
         <p style="color: var(--text-light); font-size: 0.9rem; margin-top: 8px;">
@@ -19,9 +19,9 @@
         </p>
     </div>
 
-    <div class="menu-card" @click="setView('settings', 'Pengaturan')">
+    <div class="menu-card" @click="setView('settings-profile', 'Profil Desa')">
         <div class="card-icon bg-pink">
-            <i data-lucide="settings-2"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
         </div>
         <h3>Pengaturan</h3>
         <p style="color: var(--text-light); font-size: 0.9rem; margin-top: 8px;">
@@ -29,46 +29,45 @@
         </p>
     </div>
 </div>
+
+<div class="flat-card" style="margin-top: 32px;">
+    <div style="margin-bottom: 24px;">
+        <h3 style="font-size: 1.25rem; font-weight: 700;">Riwayat Arsip Terbaru</h3>
+        <p style="color: var(--text-light); font-size: 0.9rem;">Daftar dokumen yang baru saja diunggah</p>
+    </div>
     
-<div class="card" style="margin-top: 32px;">
-        <div class="auth-header" style="text-align: left; margin-bottom: 24px;">
-            <h3>Riwayat Arsip Terbaru</h3>
-            <p>Daftar dokumen yang baru saja diunggah</p>
-        </div>
-        
-        <div class="table-container">
-            <table class="table">
-                <thead>
+    <div style="overflow-x: auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>NO. ARSIP</th>
+                    <th>NAMA PEMILIK</th>
+                    <th>JENIS</th>
+                    <th>TANGGAL SIMPAN</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template x-if="!loading && searchResults.length === 0">
                     <tr>
-                        <th>NO. ARSIP</th>
-                        <th>NAMA PEMILIK</th>
-                        <th>JENIS</th>
-                        <th>TANGGAL SIMPAN</th>
+                        <td colspan="4" style="text-align: center; padding: 48px; color: var(--text-light);">
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                <span>Belum ada data arsip.</span>
+                            </div>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    <template x-if="!loading && searchResults.length === 0">
-                        <tr>
-                            <td colspan="4" style="text-align: center; padding: 48px; color: var(--text-light);">
-                                <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                                    <span>Belum ada data arsip.</span>
-                                </div>
-                            </td>
-                        </tr>
-                    </template>
-                    <template x-for="item in searchResults" :key="item.id">
-                        <tr>
-                            <td x-text="item.nomor"></td>
-                            <td x-text="item.namaPemilik"></td>
-                            <td>
-                                <span class="badge" :class="item.jenis === 'Masuk' ? 'badge-incoming' : 'badge-outgoing'" x-text="item.jenis"></span>
-                            </td>
-                            <td x-text="formatDate(item.timestamp)"></td>
-                        </tr>
-                    </template>
-                </tbody>
-            </table>
-        </div>
+                </template>
+                <template x-for="item in searchResults" :key="item.id">
+                    <tr>
+                        <td style="font-weight: 600;" x-text="item.nomor"></td>
+                        <td x-text="item.namaPemilik"></td>
+                        <td>
+                            <span class="badge" :class="item.jenis === 'Masuk' ? 'bg-blue' : 'bg-pink'" x-text="item.jenis"></span>
+                        </td>
+                        <td x-text="formatDate(item.timestamp)"></td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
     </div>
 </div>

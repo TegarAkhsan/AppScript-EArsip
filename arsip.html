@@ -34,7 +34,7 @@
                         <td style="font-weight: 600;" x-text="item.nomor"></td>
                         <td x-text="item.namaPemilik"></td>
                         <td>
-                            <span :class="'badge ' + (item.jenis === 'Masuk' ? 'bg-blue' : 'bg-purple')" x-text="item.jenis"></span>
+                            <span :class="'badge ' + (item.jenis === 'Masuk' ? 'bg-blue' : 'bg-pink')" x-text="item.jenis"></span>
                         </td>
                         <td x-text="formatDate(item.timestamp)"></td>
                         <td>
@@ -42,7 +42,7 @@
                                 <button class="action-btn" title="Preview" @click="window.open(item.viewUrl, '_blank')">
                                     <i data-lucide="eye"></i>
                                 </button>
-                                <button class="action-btn" title="Edit Nama" @click="handleEditName(item)">
+                                <button class="action-btn" title="Edit Nama" @click="openEditModal(item)">
                                     <i data-lucide="edit-3"></i>
                                 </button>
                                 <button class="action-btn" title="Download" @click="window.open(item.downloadUrl, '_blank')">
@@ -57,6 +57,26 @@
                 </template>
             </tbody>
         </table>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal-overlay" x-show="showEditModal" x-cloak style="display: flex; align-items: center; justify-content: center; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 9999;">
+        <div class="flat-card" @click.away="showEditModal = false" style="width: 100%; max-width: 450px; padding: 32px;">
+            <div style="margin-bottom: 24px;">
+                <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 8px;">Edit Nama Pemilik</h3>
+                <p style="color: var(--text-light); font-size: 0.9rem;">Perbarui nama pemilik untuk arsip: <span x-text="editTarget?.nomor" style="font-weight: 700; color: var(--primary);"></span></p>
+            </div>
+            
+            <div class="form-group">
+                <label>Nama Pemilik</label>
+                <input type="text" class="form-input" x-model="editTargetName" placeholder="Masukkan nama baru...">
+            </div>
+            
+            <div style="display: flex; gap: 12px; margin-top: 32px;">
+                <button class="btn" style="background: #f1f5f9; color: var(--text);" @click="showEditModal = false">Batal</button>
+                <button class="btn btn-primary" @click="saveEditName">Simpan Perubahan</button>
+            </div>
+        </div>
     </div>
 </div>
 
