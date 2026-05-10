@@ -29,3 +29,46 @@
         </p>
     </div>
 </div>
+    
+<div class="card" style="margin-top: 32px;">
+        <div class="auth-header" style="text-align: left; margin-bottom: 24px;">
+            <h3>Riwayat Arsip Terbaru</h3>
+            <p>Daftar dokumen yang baru saja diunggah</p>
+        </div>
+        
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>NO. ARSIP</th>
+                        <th>NAMA PEMILIK</th>
+                        <th>JENIS</th>
+                        <th>TANGGAL SIMPAN</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template x-if="!loading && searchResults.length === 0">
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 48px; color: var(--text-light);">
+                                <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                    <span>Belum ada data arsip.</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </template>
+                    <template x-for="item in searchResults" :key="item.id">
+                        <tr>
+                            <td x-text="item.nomor"></td>
+                            <td x-text="item.namaPemilik"></td>
+                            <td>
+                                <span class="badge" :class="item.jenis === 'Masuk' ? 'badge-incoming' : 'badge-outgoing'" x-text="item.jenis"></span>
+                            </td>
+                            <td x-text="formatDate(item.timestamp)"></td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

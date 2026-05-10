@@ -9,6 +9,8 @@ function app() {
         currentPageTitle: 'Menu Utama',
         user: { email: '', namaDesa: '', alamatDesa: '' },
         toast: { show: false, message: '', type: 'info' },
+        lastActivity: Date.now(),
+        sessionTimeout: 30 * 60 * 1000, // 30 Minutes
         
         // Forms
         authStep: 'login', // login, register, forgot, pin
@@ -25,12 +27,39 @@ function app() {
             lucide.createIcons();
             // Check local storage for session (simplified)
             const savedUser = localStorage.getItem('e_arsip_user');
-            if (savedUser) {
-                this.user = JSON.parse(savedUser);
-                this.isLoggedIn = true;
-                this.authStep = 'pin';
-                this.settingsForm.namaDesa = this.user.namaDesa;
-                this.settingsForm.alamatDesa = this.user.alamatDesa;
+            const savedTime = localStorage.getItem('e_arsip_last_activity');
+            
+            if (savedUser && savedTime) {
+                const now = Date.now();
+                if (now - parseInt(savedTime) > this.sessionTimeout) {
+                    this.logout('Sesi telah berakhir. Silakan login kembali.');
+                } else {
+                    this.user = JSON.parse(savedUser);
+                    this.isLoggedIn = true;
+                    this.authStep = 'pin';
+                    this.settingsForm.namaDesa = this.user.namaDesa;
+                    this.settingsForm.alamatDesa = this.user.alamatDesa;
+                    this.updateActivity();
+                }
+            }
+
+            // Global Activity Tracker
+            window.addEventListener('mousemove', () => this.updateActivity());
+            window.addEventListener('keypress', () => this.updateActivity());
+            window.addEventListener('click', () => this.updateActivity());
+
+            // Check timeout every minute
+            setInterval(() => {
+                if (this.isLoggedIn && Date.now() - this.lastActivity > this.sessionTimeout) {
+                    this.logout('Sesi berakhir karena tidak ada aktivitas.');
+                }
+            }, 60000);
+        },
+
+        updateActivity() {
+            if (this.isLoggedIn) {
+                this.lastActivity = Date.now();
+                localStorage.setItem('e_arsip_last_activity', this.lastActivity.toString());
             }
         },
 
@@ -43,7 +72,10 @@ function app() {
             this.view = v;
             this.currentPageTitle = title;
             setTimeout(() => lucide.createIcons(), 50);
-            if (v === 'search') this.handleSearch();
+            if (v === 'search' || v === 'menu') {
+                this.searchQuery = ''; // Reset query to show all
+                this.handleSearch();
+            }
         },
 
         // Auth Actions
@@ -142,12 +174,14 @@ function app() {
                 .resetPassword(this.forgotForm.email, this.forgotForm.otp, this.forgotForm.newPassword);
         },
 
-        logout() {
+        logout(msg) {
             localStorage.removeItem('e_arsip_user');
+            localStorage.removeItem('e_arsip_last_activity');
             this.isLoggedIn = false;
             this.isPinVerified = false;
             this.authStep = 'login';
             this.user = { email: '' };
+            if (msg) this.showToast(msg, 'info');
         },
 
         // Archive Actions
@@ -192,8 +226,20 @@ function app() {
             google.script.run
                 .withSuccessHandler(res => {
                     this.loading = false;
-                    this.searchResults = res;
+                    if (res && res.error) {
+                        this.showToast('Error Server: ' + res.error, 'error');
+                        this.searchResults = [];
+                    } else {
+                        this.searchResults = res || [];
+                        if (this.searchResults.length === 0) {
+                            this.showToast('Tidak ada data ditemukan', 'info');
+                        }
+                    }
                     setTimeout(() => lucide.createIcons(), 50);
+                })
+                .withFailureHandler(err => {
+                    this.loading = false;
+                    this.showToast('Gagal memuat data: ' + err.message, 'error');
                 })
                 .searchArsip(this.searchQuery);
         },

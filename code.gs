@@ -136,14 +136,20 @@ function uploadArsip(obj) {
     const blob = Utilities.newBlob(Utilities.base64Decode(obj.data), obj.mimeType, obj.fileName);
     const file = folder.createFile(blob);
     
-    // Set sharing to anyone with link for easy preview/download within the app
-    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    // Attempt to set sharing, but don't crash if organization policies restrict it
+    try {
+      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    } catch (e) {
+      console.warn('Gagal mengatur sharing: ' + e.toString());
+    }
     
     const ss = getDb();
     const sheet = ss.getSheetByName(CONFIG.SHEET_ARCHIVES);
     const id = 'ARS-' + new Date().getTime();
     
-    sheet.appendRow([
+    // Faster way to append data
+    const lastRow = sheet.getLastRow();
+    sheet.getRange(lastRow + 1, 1, 1, 8).setValues([[
       id,
       new Date(),
       obj.nomor,
@@ -152,7 +158,9 @@ function uploadArsip(obj) {
       obj.fileName,
       file.getId(),
       obj.mimeType
-    ]);
+    ]]);
+    
+    SpreadsheetApp.flush(); // Commit changes immediately
     
     return { success: true, id: id };
   } catch (e) {
@@ -161,34 +169,69 @@ function uploadArsip(obj) {
 }
 
 function searchArsip(query) {
-  const ss = getDb();
-  const sheet = ss.getSheetByName(CONFIG.SHEET_ARCHIVES);
-  const data = sheet.getDataRange().getValues();
-  const results = [];
-  
-  const q = query.toLowerCase();
-  for (let i = 1; i < data.length; i++) {
-    const nomor = data[i][2].toString().toLowerCase();
-    const nama = data[i][3].toString().toLowerCase();
-    const jenis = data[i][4].toString().toLowerCase();
+  try {
+    const ss = getDb();
+    SpreadsheetApp.flush(); // Ensure all writes are committed
     
-    if (nomor.includes(q) || nama.includes(q) || jenis.includes(q)) {
-      results.push({
-        id: data[i][0],
-        timestamp: data[i][1],
-        nomor: data[i][2],
-        namaPemilik: data[i][3],
-        jenis: data[i][4],
-        fileName: data[i][5],
-        fileId: data[i][6],
-        mimeType: data[i][7],
-        viewUrl: `https://drive.google.com/file/d/${data[i][6]}/preview`,
-        downloadUrl: `https://drive.google.com/uc?export=download&id=${data[i][6]}`,
-        printUrl: `https://drive.google.com/file/d/${data[i][6]}/view?usp=sharing`
-      });
+    // Robust sheet selection
+    const sheetName = CONFIG.SHEET_ARCHIVES.trim().toLowerCase();
+    const sheet = ss.getSheets().find(s => s.getName().trim().toLowerCase() === sheetName);
+    
+    if (!sheet) {
+      console.error('Sheet not found by name:', CONFIG.SHEET_ARCHIVES);
+      return { error: 'Sheet "Archives" tidak ditemukan di Spreadsheet.' };
     }
+    
+    const rawData = sheet.getDataRange().getValues();
+    console.log('Raw data length:', rawData.length);
+    
+    // Filter out truly empty rows
+    const data = rawData.filter(row => row[0] !== "" && row[0] !== null && row[0] !== undefined);
+    console.log('Filtered data length (with headers):', data.length);
+    
+    if (data.length <= 1) {
+      console.log('No data rows found after filtering.');
+      return [];
+    }
+    
+    const results = [];
+    const q = (query || "").toLowerCase().trim();
+    
+    // Process from newest (bottom) to oldest (top), skipping header at index 0
+    for (let i = data.length - 1; i >= 1; i--) {
+      const row = data[i];
+      const nomor = (row[2] || "").toString();
+      const nama = (row[3] || "").toString();
+      const jenis = (row[4] || "").toString();
+      
+      // Match query
+      if (!q || nomor.toLowerCase().includes(q) || nama.toLowerCase().includes(q) || jenis.toLowerCase().includes(q)) {
+        results.push({
+          id: row[0].toString(),
+          timestamp: row[1],
+          nomor: nomor || '-',
+          namaPemilik: nama || '-',
+          jenis: jenis || '-',
+          fileName: row[5] || 'Tanpa Nama',
+          fileId: row[6],
+          mimeType: row[7],
+          viewUrl: row[6] ? `https://drive.google.com/file/d/${row[6]}/preview` : '#',
+          downloadUrl: row[6] ? `https://drive.google.com/uc?export=download&id=${row[6]}` : '#',
+          printUrl: row[6] ? `https://drive.google.com/file/d/${row[6]}/view?usp=sharing` : '#'
+        });
+      }
+      
+      // Limit to 20 for search results, 10 for dashboard
+      const limit = q ? 20 : 10;
+      if (results.length >= limit) break;
+    }
+    
+    console.log('Returning results:', results.length);
+    return results;
+  } catch (e) {
+    console.error('Search Error Detail:', e.stack);
+    return { error: 'Gagal memuat data: ' + e.toString() };
   }
-  return results;
 }
 
 function updateArsipName(id, newName) {
