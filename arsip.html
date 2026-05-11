@@ -15,7 +15,6 @@
                 <tr>
                     <th>No. Arsip</th>
                     <th>Nama Pemilik</th>
-                    <th>Jenis</th>
                     <th>Tanggal Simpan</th>
                     <th>Aksi</th>
                 </tr>
@@ -23,7 +22,7 @@
             <tbody>
                 <template x-if="searchResults.length === 0">
                     <tr>
-                        <td colspan="5" style="text-align: center; padding: 48px; color: var(--text-light);">
+                        <td colspan="4" style="text-align: center; padding: 48px; color: var(--text-light);">
                             <i data-lucide="info" style="margin-bottom: 12px; opacity: 0.5;"></i><br>
                             Data tidak ditemukan atau belum ada data.
                         </td>
@@ -33,9 +32,6 @@
                     <tr>
                         <td style="font-weight: 600;" x-text="item.nomor"></td>
                         <td x-text="item.namaPemilik"></td>
-                        <td>
-                            <span :class="'badge ' + (item.jenis === 'Masuk' ? 'bg-blue' : 'bg-pink')" x-text="item.jenis"></span>
-                        </td>
                         <td x-text="formatDate(item.timestamp)"></td>
                         <td>
                             <div style="display: flex; gap: 8px;">
@@ -59,25 +55,7 @@
         </table>
     </div>
 
-    <!-- Edit Modal -->
-    <div class="modal-overlay" x-show="showEditModal" x-cloak style="display: flex; align-items: center; justify-content: center; position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 9999;">
-        <div class="flat-card" @click.away="showEditModal = false" style="width: 100%; max-width: 450px; padding: 32px;">
-            <div style="margin-bottom: 24px;">
-                <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 8px;">Edit Nama Pemilik</h3>
-                <p style="color: var(--text-light); font-size: 0.9rem;">Perbarui nama pemilik untuk arsip: <span x-text="editTarget?.nomor" style="font-weight: 700; color: var(--primary);"></span></p>
-            </div>
-            
-            <div class="form-group">
-                <label>Nama Pemilik</label>
-                <input type="text" class="form-input" x-model="editTargetName" placeholder="Masukkan nama baru...">
-            </div>
-            
-            <div style="display: flex; gap: 12px; margin-top: 32px;">
-                <button class="btn" style="background: #f1f5f9; color: var(--text);" @click="showEditModal = false">Batal</button>
-                <button class="btn btn-primary" @click="saveEditName">Simpan Perubahan</button>
-            </div>
-        </div>
-    </div>
+
 </div>
 
 <style>

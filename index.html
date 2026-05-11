@@ -13,6 +13,34 @@
     <?!= include('style'); ?>
 </head>
 <body x-data="app()" x-init="init()">
+    <!-- Global Modals -->
+    <div class="modal-overlay" 
+         x-show="showEditModal" 
+         x-cloak 
+         x-transition
+         style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 999999;">
+        <div class="flat-card" 
+             @click.away="showEditModal = false" 
+             style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 450px; padding: 40px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.1); margin: 0;">
+            <div style="margin-bottom: 32px; text-align: center;">
+                <div class="card-icon bg-blue" style="margin: 0 auto 16px;">
+                    <i data-lucide="edit-3"></i>
+                </div>
+                <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; color: var(--text);">Edit Nama Pemilik</h3>
+                <p style="color: var(--text-light); font-size: 0.9rem;">Arsip: <span x-text="editTarget?.nomor" style="font-weight: 700; color: var(--accent);"></span></p>
+            </div>
+            
+            <div class="form-group">
+                <label>Nama Pemilik Baru</label>
+                <input type="text" class="form-input" x-model="editTargetName" placeholder="Masukkan nama baru..." @keydown.enter="saveEditName">
+            </div>
+            
+            <div style="display: flex; gap: 16px; margin-top: 40px;">
+                <button class="btn" style="background: rgba(255,255,255,0.05); color: var(--text); flex: 1;" @click="showEditModal = false">BATAL</button>
+                <button class="btn btn-primary" style="flex: 2;" @click="saveEditName">SIMPAN PERUBAHAN</button>
+            </div>
+        </div>
+    </div>
     
     <!-- Loading Overlay -->
     <div x-show="loading" class="loading-overlay" x-transition>
@@ -35,11 +63,17 @@
         <!-- Main Dashboard -->
         <template x-if="isLoggedIn && isPinVerified">
             <div class="dashboard-layout">
+                <div class="sidebar-overlay" :class="showMobileMenu ? 'active' : ''" @click="showMobileMenu = false"></div>
                 <?!= include('sidebar'); ?>
                 <div class="content-area">
                     <header class="top-nav">
-                        <div class="page-title">
-                            <h2 x-text="currentPageTitle"></h2>
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <button class="hamburger-btn" @click="showMobileMenu = true">
+                                <i data-lucide="menu"></i>
+                            </button>
+                            <div class="page-title">
+                                <h2 x-text="currentPageTitle"></h2>
+                            </div>
                         </div>
                         <div class="user-profile-small">
                             <img :src="'https://ui-avatars.com/api/?name=' + user.email + '&background=6366f1&color=fff'" alt="Avatar">
@@ -66,5 +100,6 @@
     </main>
 
     <?!= include('script'); ?>
+
 </body>
 </html>

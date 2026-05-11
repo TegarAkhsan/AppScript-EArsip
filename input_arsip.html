@@ -5,17 +5,7 @@
     </div>
 
     <form @submit.prevent="handleUpload">
-        <div class="form-group">
-            <label>Jenis Dokumen</label>
-            <div style="display: flex; gap: 16px; margin-top: 8px;">
-                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <input type="radio" x-model="uploadForm.jenis" value="Masuk" required> Surat Masuk
-                </label>
-                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                    <input type="radio" x-model="uploadForm.jenis" value="Keluar" required> Surat Keluar
-                </label>
-            </div>
-        </div>
+
         <div class="form-group">
             <label>Nomor Dokumen / Surat</label>
             <input type="text" class="form-input" x-model="uploadForm.nomor" required placeholder="Contoh: 001/DS/2026">

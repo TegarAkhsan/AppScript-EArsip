@@ -19,7 +19,7 @@
                 <input type="password" class="form-input" x-model="authForm.password" required placeholder="••••••••">
             </div>
             <button type="submit" class="btn btn-primary">MASUK</button>
-            <button type="button" @click="loginAdmin()" class="btn btn-admin" style="margin-top: 12px; background: #1e293b; color: white;">
+            <button type="button" @click="loginAdmin()" class="btn btn-admin" style="margin-top: 12px; background: var(--primary-dark); color: white;">
                 <i data-lucide="shield-check"></i> LOGIN ADMIN
             </button>
             
@@ -101,7 +101,7 @@
     <!-- PIN Verification Screen -->
     <div class="auth-card" x-show="authStep === 'pin'" x-transition>
         <div class="auth-header">
-            <div class="card-icon bg-purple" style="margin: 0 auto 24px;">
+            <div class="card-icon bg-blue" style="margin: 0 auto 24px;">
                 <i data-lucide="lock"></i>
             </div>
             <h1>Masukkan PIN</h1>
@@ -109,26 +109,26 @@
         </div>
         
         <form @submit.prevent="handlePinVerify">
-            <div class="form-group" style="text-align: center; position: relative;">
-                <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 24px;" @click="$refs.pinInput.focus()">
-                    <template x-for="i in 6">
-                        <div :class="authForm.pinInput.length >= i ? 'pin-dot active' : 'pin-dot'"></div>
+            <div class="form-group" style="text-align: center; position: relative; margin-bottom: 32px;">
+                <div style="display: flex; gap: 12px; justify-content: center;" @click="$refs.pinInput.focus()">
+                    <template x-for="i in [1,2,3,4,5,6]" :key="i">
+                        <div class="pin-box" :class="authForm.pinInput.length >= i ? 'active' : ''" x-text="authForm.pinInput[i-1] ? '●' : ''"></div>
                     </template>
                 </div>
                 
-                <input type="tel" 
+                <input type="password" 
                        x-ref="pinInput"
-                       class="form-input" 
                        maxlength="6" 
                        x-model="authForm.pinInput" 
-                       style="position: absolute; opacity: 0; inset: 0; width: 100%; height: 60px; cursor: pointer;">
+                       inputmode="numeric"
+                       style="position: absolute; opacity: 0; inset: 0; width: 100%; height: 60px; cursor: pointer; z-index: 10;">
                 
-                <p style="font-size: 0.85rem; color: var(--text-light);">Ketuk di atas untuk memasukkan 6 digit PIN</p>
+                <p style="font-size: 0.85rem; color: var(--text-light); margin-top: 20px;">Ketuk kotak di atas untuk memasukkan 6 digit PIN</p>
             </div>
             
-            <button type="submit" class="btn btn-primary">VERIFIKASI PIN</button>
+            <button type="submit" class="btn btn-primary" :disabled="authForm.pinInput.length < 6">VERIFIKASI PIN</button>
             
-            <button type="button" @click="pinAdmin()" class="btn btn-admin" style="margin-top: 12px; background: #1e293b; color: white;">
+            <button type="button" @click="pinAdmin()" class="btn btn-admin" style="margin-top: 12px; background: var(--primary-dark); color: white;">
                 <i data-lucide="shield-check"></i> PIN ADMIN
             </button>
             
@@ -138,14 +138,22 @@
 </div>
 
 <style>
-.pin-dot {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    border: 2px solid var(--primary);
-    transition: all 0.2s;
+.pin-box {
+    width: 45px;
+    height: 55px;
+    border-radius: 12px;
+    border: 2px solid #334155;
+    background: #262626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--accent);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.pin-dot.active {
-    background: var(--primary);
+.pin-box.active {
+    border-color: var(--primary);
+    background: rgba(96, 113, 47, 0.1);
+    box-shadow: 0 0 0 4px rgba(96, 113, 47, 0.1);
 }
 </style>

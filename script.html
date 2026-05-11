@@ -7,6 +7,7 @@ function app() {
         isPinVerified: localStorage.getItem('e_arsip_pin_verified') === 'true',
         view: 'menu',
         currentPageTitle: 'Menu Utama',
+        showMobileMenu: false,
         user: JSON.parse(localStorage.getItem('e_arsip_user') || '{"email":""}'),
         toast: { show: false, message: '', type: 'info' },
         lastActivity: parseInt(localStorage.getItem('e_arsip_last_activity') || Date.now()),
@@ -17,7 +18,7 @@ function app() {
         authForm: { email: '', password: '', pin: '', pinInput: '' },
         forgotForm: { email: '', otp: '', newPassword: '', confirmPassword: '' },
         forgotState: { otpSent: false, otpVerified: false },
-        uploadForm: { nomor: '', namaPemilik: '', jenis: 'Masuk', fileName: '', data: '', mimeType: '' },
+        uploadForm: { nomor: '', namaPemilik: '', fileName: '', data: '', mimeType: '' },
         searchQuery: '',
         searchResults: [],
         
@@ -70,6 +71,7 @@ function app() {
         setView(v, title) {
             this.view = v;
             this.currentPageTitle = title;
+            this.showMobileMenu = false;
             setTimeout(() => lucide.createIcons(), 50);
             if (v === 'search' || v === 'menu') {
                 this.searchQuery = ''; 
@@ -94,6 +96,7 @@ function app() {
                         this.showToast(res.message, 'error');
                     }
                 })
+                .withFailureHandler(err => this.handleError(err))
                 .login(this.authForm.email, this.authForm.password);
         },
 
@@ -158,7 +161,7 @@ function app() {
                     this.loading = false;
                     if (res.success) {
                         this.showToast('Dokumen tersimpan.', 'success');
-                        this.uploadForm = { nomor: '', namaPemilik: '', jenis: 'Masuk', fileName: '', data: '', mimeType: '' };
+                        this.uploadForm = { nomor: '', namaPemilik: '', fileName: '', data: '', mimeType: '' };
                         document.getElementById('file-upload').value = '';
                         this.setView('menu', 'Menu Utama');
                     } else {
@@ -189,6 +192,7 @@ function app() {
                         this.showToast(res.message, 'error');
                     }
                 })
+                .withFailureHandler(err => this.handleError(err))
                 .updateArsipName(this.editTarget.id, this.editTargetName);
         },
 
@@ -205,10 +209,7 @@ function app() {
                     }
                     setTimeout(() => lucide.createIcons(), 50);
                 })
-                .withFailureHandler(() => {
-                    this.loading = false;
-                    this.showToast('Gagal memuat data', 'error');
-                })
+                .withFailureHandler(err => this.handleError(err))
                 .searchArsip(this.searchQuery);
         },
 

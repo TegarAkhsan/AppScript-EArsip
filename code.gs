@@ -5,8 +5,7 @@
 
 const CONFIG = {
   SPREADSHEET_ID: '1_PoQaAhM-Tz0ojG4Qc1D23mnSKN0IfFiY-R8ZYN6nAE',
-  FOLDER_MASUK: '1X4D10qzOM9LjoirlW5xmk7HisVUtD-T0',
-  FOLDER_KELUAR: '12pCSn3ohmQQbCkFqDD8D7CrQXnr8LOgW',
+  FOLDER_ARCHIVE: '1X4D10qzOM9LjoirlW5xmk7HisVUtD-T0', // Using FOLDER_MASUK as default
   SHEET_USERS: 'Users',
   SHEET_ARCHIVES: 'Archives'
 };
@@ -40,7 +39,7 @@ function getDb() {
         // Add Default Admin
         sheet.appendRow(['admin@earsip.com', 'admin123', '123456', 'Pusat Digital', 'Jl. Arsitektur No. 1', '']);
       } else if (name === CONFIG.SHEET_ARCHIVES) {
-        sheet.appendRow(['ID', 'Timestamp', 'Nomor', 'Nama Pemilik', 'Jenis', 'FileName', 'FileID', 'FileType']);
+        sheet.appendRow(['ID', 'Timestamp', 'Nomor', 'Nama Pemilik', 'FileName', 'FileID', 'FileType']);
       }
     }
   });
@@ -131,7 +130,7 @@ function resetPassword(email, otp, newPassword) {
  */
 function uploadArsip(obj) {
   try {
-    const folderId = obj.jenis === 'Masuk' ? CONFIG.FOLDER_MASUK : CONFIG.FOLDER_KELUAR;
+    const folderId = CONFIG.FOLDER_ARCHIVE;
     const folder = DriveApp.getFolderById(folderId);
     const blob = Utilities.newBlob(Utilities.base64Decode(obj.data), obj.mimeType, obj.fileName);
     const file = folder.createFile(blob);
@@ -149,12 +148,11 @@ function uploadArsip(obj) {
     
     // Faster way to append data
     const lastRow = sheet.getLastRow();
-    sheet.getRange(lastRow + 1, 1, 1, 8).setValues([[
+    sheet.getRange(lastRow + 1, 1, 1, 7).setValues([[
       id,
       new Date(),
       obj.nomor,
       obj.namaPemilik,
-      obj.jenis,
       obj.fileName,
       file.getId(),
       obj.mimeType
@@ -202,22 +200,21 @@ function searchArsip(query) {
       const row = data[i];
       const nomor = (row[2] || "").toString();
       const nama = (row[3] || "").toString();
-      const jenis = (row[4] || "").toString();
       
       // Match query
-      if (!q || nomor.toLowerCase().includes(q) || nama.toLowerCase().includes(q) || jenis.toLowerCase().includes(q)) {
+      if (!q || nomor.toLowerCase().includes(q) || nama.toLowerCase().includes(q)) {
+        const hasJenis = row.length >= 8;
         results.push({
           id: row[0].toString(),
           timestamp: row[1] instanceof Date ? row[1].toISOString() : row[1].toString(),
           nomor: nomor || '-',
           namaPemilik: nama || '-',
-          jenis: jenis || '-',
-          fileName: row[5] || 'Tanpa Nama',
-          fileId: row[6],
-          mimeType: row[7],
-          viewUrl: row[6] ? `https://drive.google.com/file/d/${row[6]}/preview` : '#',
-          downloadUrl: row[6] ? `https://drive.google.com/uc?export=download&id=${row[6]}` : '#',
-          printUrl: row[6] ? `https://drive.google.com/file/d/${row[6]}/view?usp=sharing` : '#'
+          fileName: (hasJenis ? row[5] : row[4]) || 'Tanpa Nama',
+          fileId: hasJenis ? row[6] : row[5],
+          mimeType: hasJenis ? row[7] : row[6],
+          viewUrl: (hasJenis ? row[6] : row[5]) ? `https://drive.google.com/file/d/${hasJenis ? row[6] : row[5]}/preview` : '#',
+          downloadUrl: (hasJenis ? row[6] : row[5]) ? `https://drive.google.com/uc?export=download&id=${hasJenis ? row[6] : row[5]}` : '#',
+          printUrl: (hasJenis ? row[6] : row[5]) ? `https://drive.google.com/file/d/${hasJenis ? row[6] : row[5]}/view?usp=sharing` : '#'
         });
       }
       
