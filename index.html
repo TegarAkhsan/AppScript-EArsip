@@ -54,50 +54,48 @@
         </div>
     </div>
 
-    <main class="app-container">
-        <!-- Auth Views -->
-        <template x-if="!isLoggedIn || !isPinVerified">
+    <div class="app-container" x-cloak>
+        <!-- Auth Screens -->
+        <div x-show="!isLoggedIn || !isPinVerified">
             <?!= include('auth'); ?>
-        </template>
+        </div>
 
         <!-- Main Dashboard -->
-        <template x-if="isLoggedIn && isPinVerified">
-            <div class="dashboard-layout">
-                <div class="sidebar-overlay" :class="showMobileMenu ? 'active' : ''" @click="showMobileMenu = false"></div>
-                <?!= include('sidebar'); ?>
-                <div class="content-area">
-                    <header class="top-nav">
-                        <div style="display: flex; align-items: center; gap: 16px;">
-                            <button class="hamburger-btn" @click="showMobileMenu = true">
-                                <i data-lucide="menu"></i>
-                            </button>
-                            <div class="page-title">
-                                <h2 x-text="currentPageTitle"></h2>
-                            </div>
+        <div class="dashboard-layout" x-show="isLoggedIn && isPinVerified">
+            <div class="sidebar-overlay" :class="showMobileMenu ? 'active' : ''" @click="showMobileMenu = false"></div>
+            <?!= include('sidebar'); ?>
+            <div class="content-area">
+                <header class="top-nav">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <button class="hamburger-btn" @click="showMobileMenu = true">
+                            <i data-lucide="menu"></i>
+                        </button>
+                        <div class="page-title">
+                            <h2 x-text="currentPageTitle"></h2>
                         </div>
-                        <div class="user-profile-small">
-                            <img :src="'https://ui-avatars.com/api/?name=' + user.email + '&background=6366f1&color=fff'" alt="Avatar">
-                        </div>
-                    </header>
-                    
-                    <div class="view-container" x-cloak>
-                        <template x-if="view === 'menu'">
-                            <div x-transition><?!= include('dashboard'); ?></div>
-                        </template>
-                        <template x-if="view === 'input'">
-                            <div x-transition><?!= include('input_arsip'); ?></div>
-                        </template>
-                        <template x-if="view === 'search'">
-                            <div x-transition><?!= include('arsip'); ?></div>
-                        </template>
-                        <template x-if="view.startsWith('settings')">
-                            <div x-transition><?!= include('settings'); ?></div>
-                        </template>
                     </div>
-                </div>
+                    <div class="user-profile-small">
+                        <img :src="'https://ui-avatars.com/api/?name=' + user.email + '&background=6366f1&color=fff'" alt="Avatar">
+                    </div>
+                </header>
+
+                <main class="main-content">
+                    <div x-show="view === 'menu'">
+                        <?!= include('dashboard'); ?>
+                    </div>
+                    <div x-show="view === 'input'">
+                        <?!= include('input_arsip'); ?>
+                    </div>
+                    <div x-show="view === 'search'">
+                        <?!= include('arsip'); ?>
+                    </div>
+                    <div x-show="view === 'settings-profile' || view === 'settings-security'">
+                        <?!= include('settings'); ?>
+                    </div>
+                </main>
             </div>
-        </template>
-    </main>
+        </div>
+    </div>
 
     <?!= include('script'); ?>
 

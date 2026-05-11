@@ -89,13 +89,15 @@ body {
 }
 
 .dashboard-layout {
-    display: grid;
-    grid-template-columns: 280px 1fr;
+    display: flex;
     height: 100vh;
     overflow: hidden;
+    width: 100%;
 }
 
 .sidebar {
+    width: 280px;
+    flex-shrink: 0;
     background: var(--surface);
     border-right: 1px solid #334155;
     padding: 32px 24px;
@@ -158,9 +160,8 @@ body {
 
 /* Content Area */
 .content-area {
+    flex: 1;
     padding: 32px 48px;
-    max-width: 1400px;
-    margin: 0 auto;
     width: 100%;
     height: 100vh;
     overflow-y: auto;
@@ -395,10 +396,12 @@ td {
 @media (max-width: 1024px) {
     .dashboard-layout {
         display: block;
+        position: relative;
     }
     
     .sidebar {
         position: fixed;
+        width: 280px;
         left: -280px;
         top: 0;
         bottom: 0;
@@ -445,5 +448,27 @@ td {
     .page-title h2 {
         font-size: 1.4rem;
     }
+}
+
+/* PIN Input Styles */
+.pin-box {
+    width: 45px;
+    height: 55px;
+    border-radius: 10px;
+    border: 2px solid #64748b !important; /* Visible slate border */
+    background: #1a1a1a !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #F4F08D;
+    transition: all 0.2s ease;
+}
+
+.pin-box.active {
+    border-color: #60712F !important;
+    background: rgba(96, 113, 47, 0.2) !important;
+    box-shadow: 0 0 15px rgba(96, 113, 47, 0.3);
+    transform: translateY(-2px);
 }
 </style>
