@@ -89,6 +89,23 @@ function verifyPin(email, pin) {
   return { success: false, message: 'PIN salah' };
 }
 
+function loginWithPin(pin) {
+  const ss = getDb();
+  const sheet = ss.getSheetByName(CONFIG.SHEET_USERS);
+  const data = sheet.getDataRange().getValues();
+  
+  // Search for user by PIN
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][2] == pin) {
+      return { 
+        success: true, 
+        user: { email: data[i][0], namaDesa: data[i][3], alamatDesa: data[i][4] } 
+      };
+    }
+  }
+  return { success: false, message: 'PIN tidak valid atau tidak terdaftar' };
+}
+
 /**
  * FORGOT PASSWORD & OTP
  */
@@ -231,18 +248,53 @@ function searchArsip(query) {
   }
 }
 
-function updateArsipName(id, newName) {
-  const ss = getDb();
-  const sheet = ss.getSheetByName(CONFIG.SHEET_ARCHIVES);
-  const data = sheet.getDataRange().getValues();
-  
-  for (let i = 1; i < data.length; i++) {
-    if (data[i][0] === id) {
-      sheet.getRange(i + 1, 4).setValue(newName); // Assuming we edit Nama Pemilik as per flowchart "Edit nama dokumen"
-      return { success: true };
+function updateArsip(id, newNomor, newName) {
+  try {
+    const ss = getDb();
+    const sheet = ss.getSheetByName(CONFIG.SHEET_ARCHIVES);
+    const data = sheet.getDataRange().getValues();
+    
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === id) {
+        sheet.getRange(i + 1, 3).setValue(newNomor); // Column C
+        sheet.getRange(i + 1, 4).setValue(newName);  // Column D
+        SpreadsheetApp.flush();
+        return { success: true };
+      }
     }
+    return { success: false, message: 'ID tidak ditemukan' };
+  } catch (e) {
+    return { success: false, message: e.toString() };
   }
-  return { success: false };
+}
+
+function deleteArsip(id) {
+  try {
+    const ss = getDb();
+    const sheet = ss.getSheetByName(CONFIG.SHEET_ARCHIVES);
+    const data = sheet.getDataRange().getValues();
+    
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === id) {
+        // Delete the file from Drive first
+        const fileId = data[i][5];
+        if (fileId) {
+          try {
+            DriveApp.getFileById(fileId).setTrashed(true);
+          } catch (err) {
+            console.warn('Gagal menghapus file di Drive:', err.toString());
+          }
+        }
+        
+        sheet.deleteRow(i + 1);
+        SpreadsheetApp.flush();
+        return { success: true };
+      }
+    }
+    return { success: false, message: 'ID tidak ditemukan' };
+  } catch (e) {
+    return { success: false, message: e.toString() };
+  }
 }
 
 /**

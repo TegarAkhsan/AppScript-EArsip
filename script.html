@@ -14,7 +14,7 @@ function app() {
         sessionTimeout: 30 * 60 * 1000, // 30 Minutes
         
         // Forms & Navigation
-        authStep: 'login', // login, register, forgot, pin
+        authStep: 'pin', // Hard default
         authForm: { email: '', password: '', pin: '', pinInput: '' },
         forgotForm: { email: '', otp: '', newPassword: '', confirmPassword: '' },
         forgotState: { otpSent: false, otpVerified: false },
@@ -26,6 +26,10 @@ function app() {
         showEditModal: false,
         editTarget: null,
         editTargetName: '',
+        editTargetNomor: '',
+        showDeleteModal: false,
+        deleteTarget: null,
+        sortOrder: 'desc', // 'asc' or 'desc'
 
         // Settings & Security
         settingsForm: { namaDesa: '', alamatDesa: '' },
@@ -47,8 +51,8 @@ function app() {
                 this.handleSearch();
             }
 
-            // If logged in but not verified pin, show pin step
-            if (this.isLoggedIn && !this.isPinVerified) {
+            // Force PIN screen if not verified
+            if (!this.isPinVerified) {
                 this.authStep = 'pin';
             }
 
@@ -112,13 +116,80 @@ function app() {
             this.handleLogin();
         },
 
+        handleRegister() {
+            if (!this.authForm.email || !this.authForm.password || !this.authForm.pin) {
+                return this.showToast('Lengkapi semua data', 'error');
+            }
+            if (this.authForm.pin.length !== 6) {
+                return this.showToast('PIN harus 6 digit', 'error');
+            }
+            this.loading = true;
+            google.script.run
+                .withSuccessHandler(res => {
+                    this.loading = false;
+                    if (res.success) {
+                        this.showToast('Pendaftaran berhasil! Silakan login.', 'success');
+                        this.authStep = 'pin';
+                        this.authForm.password = '';
+                        this.authForm.pin = '';
+                    } else {
+                        this.showToast(res.message, 'error');
+                    }
+                })
+                .withFailureHandler(err => this.handleError(err))
+                .register(this.authForm.email, this.authForm.password, this.authForm.pin);
+        },
+
+        handleSendOtp() {
+            if (!this.forgotForm.email) return this.showToast('Masukkan email', 'error');
+            this.loading = true;
+            google.script.run
+                .withSuccessHandler(res => {
+                    this.loading = false;
+                    if (res.success) {
+                        this.forgotState.otpSent = true;
+                        this.showToast('Kode OTP terkirim ke email.', 'success');
+                        // For demo: automatically fill OTP
+                        if (res.otp) this.forgotForm.otp = res.otp;
+                    } else {
+                        this.showToast(res.message, 'error');
+                    }
+                })
+                .withFailureHandler(err => this.handleError(err))
+                .sendOtp(this.forgotForm.email);
+        },
+
+        handleResetPassword() {
+            if (this.forgotForm.newPassword !== this.forgotForm.confirmPassword) {
+                return this.showToast('Password tidak cocok', 'error');
+            }
+            this.loading = true;
+            google.script.run
+                .withSuccessHandler(res => {
+                    this.loading = false;
+                    if (res.success) {
+                        this.showToast('Password berhasil diubah.', 'success');
+                        this.authStep = 'pin';
+                        this.forgotState = { otpSent: false, otpVerified: false };
+                        this.forgotForm = { email: '', otp: '', newPassword: '', confirmPassword: '' };
+                    } else {
+                        this.showToast(res.message, 'error');
+                    }
+                })
+                .withFailureHandler(err => this.handleError(err))
+                .resetPassword(this.forgotForm.email, this.forgotForm.otp, this.forgotForm.newPassword);
+        },
+
         handlePinVerify() {
             this.loading = true;
             google.script.run
                 .withSuccessHandler(res => {
                     this.loading = false;
                     if (res.success) {
+                        this.user = res.user;
+                        this.isLoggedIn = true;
                         this.isPinVerified = true;
+                        localStorage.setItem('e_arsip_user', JSON.stringify(res.user));
                         localStorage.setItem('e_arsip_pin_verified', 'true');
                         this.showToast('Akses diberikan.', 'success');
                         this.handleSearch();
@@ -128,7 +199,8 @@ function app() {
                         this.authForm.pinInput = '';
                     }
                 })
-                .verifyPin(this.user.email, this.authForm.pinInput);
+                .withFailureHandler(err => this.handleError(err))
+                .loginWithPin(this.authForm.pinInput);
         },
 
         pinAdmin() {
@@ -142,7 +214,7 @@ function app() {
             localStorage.removeItem('e_arsip_pin_verified');
             this.isLoggedIn = false;
             this.isPinVerified = false;
-            this.authStep = 'login';
+            this.authStep = 'pin';
             this.user = { email: '' };
             this.authForm = { email: '', password: '', pin: '', pinInput: '' };
             if (msg) this.showToast(msg, 'info');
@@ -181,17 +253,20 @@ function app() {
         openEditModal(item) {
             this.editTarget = item;
             this.editTargetName = item.namaPemilik;
+            this.editTargetNomor = item.nomor;
             this.showEditModal = true;
         },
 
-        saveEditName() {
-            if (!this.editTargetName.trim()) return this.showToast('Nama tidak boleh kosong', 'error');
+        saveEdit() {
+            if (!this.editTargetName.trim() || !this.editTargetNomor.trim()) {
+                return this.showToast('Nomor dan Nama tidak boleh kosong', 'error');
+            }
             this.loading = true;
             google.script.run
                 .withSuccessHandler(res => {
                     this.loading = false;
                     if (res.success) {
-                        this.showToast('Nama diperbarui.', 'success');
+                        this.showToast('Arsip diperbarui.', 'success');
                         this.showEditModal = false;
                         this.handleSearch();
                     } else {
@@ -199,7 +274,49 @@ function app() {
                     }
                 })
                 .withFailureHandler(err => this.handleError(err))
-                .updateArsipName(this.editTarget.id, this.editTargetName);
+                .updateArsip(this.editTarget.id, this.editTargetNomor, this.editTargetName);
+        },
+
+        handleDelete(item) {
+            this.deleteTarget = item;
+            this.showDeleteModal = true;
+            setTimeout(() => lucide.createIcons(), 50);
+        },
+
+        confirmDelete() {
+            this.showDeleteModal = false;
+            this.loading = true;
+            google.script.run
+                .withSuccessHandler(res => {
+                    this.loading = false;
+                    if (res.success) {
+                        this.showToast('Arsip berhasil dihapus.', 'success');
+                        this.handleSearch();
+                    } else {
+                        this.showToast(res.message, 'error');
+                    }
+                })
+                .withFailureHandler(err => this.handleError(err))
+                .deleteArsip(this.deleteTarget.id);
+        },
+
+        sortSearchResults(key) {
+            this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+            this.searchResults.sort((a, b) => {
+                let valA = a[key].toString().toLowerCase();
+                let valB = b[key].toString().toLowerCase();
+                
+                // Try numeric sort if both are numbers or strings representing numbers
+                if (!isNaN(valA) && !isNaN(valB)) {
+                    valA = parseFloat(valA);
+                    valB = parseFloat(valB);
+                }
+
+                if (valA < valB) return this.sortOrder === 'asc' ? -1 : 1;
+                if (valA > valB) return this.sortOrder === 'asc' ? 1 : -1;
+                return 0;
+            });
+            this.showToast(`Urutan: ${this.sortOrder === 'asc' ? 'Terkecil' : 'Terbesar'}`, 'info');
         },
 
         handleSearch() {
@@ -276,6 +393,12 @@ function app() {
             if (!date) return '-';
             const d = new Date(date);
             return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+        },
+
+        handleError(err) {
+            this.loading = false;
+            console.error('System Error:', err);
+            this.showToast('Terjadi kesalahan sistem: ' + err.toString(), 'error');
         }
     }
 }

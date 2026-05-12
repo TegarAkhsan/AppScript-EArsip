@@ -4,15 +4,64 @@
         <img src="https://lh3.googleusercontent.com/d/1xWSr_1DXgjp_C-m7DdI-ieAx6yYtkSkG" alt="Logo BERBETA" style="height: 70px; width: auto; object-fit: contain;">
         <div class="logo-text">
             <h1>BERBETA</h1>
-            <p>Electronic Archive System</p>
+            <p>Berbek Berkas Tanah Digital</p>
         </div>
     </div>
 
-    <!-- Login Screen -->
+    <!-- PIN Verification Screen (Primary Login) -->
+    <div class="auth-card" x-show="authStep === 'pin'" x-transition>
+        <div class="auth-header">
+            <h1 style="font-size: 2.2rem; margin-bottom: 8px;">Masukkan PIN</h1>
+            <p style="font-weight: 500; color: var(--primary);">Akses Sistem Digital</p>
+        </div>
+        
+        <form @submit.prevent="handlePinVerify">
+            <div class="form-group" style="text-align: center; position: relative; margin-bottom: 32px;">
+                <div style="display: flex; gap: 12px; justify-content: center; margin-bottom: 24px;" @click="$refs.pinInput.focus()">
+                    <div class="pin-box" :class="authForm.pinInput.length >= 1 ? 'active' : ''" x-text="authForm.pinInput[0] ? '●' : ''"></div>
+                    <div class="pin-box" :class="authForm.pinInput.length >= 2 ? 'active' : ''" x-text="authForm.pinInput[1] ? '●' : ''"></div>
+                    <div class="pin-box" :class="authForm.pinInput.length >= 3 ? 'active' : ''" x-text="authForm.pinInput[2] ? '●' : ''"></div>
+                    <div class="pin-box" :class="authForm.pinInput.length >= 4 ? 'active' : ''" x-text="authForm.pinInput[3] ? '●' : ''"></div>
+                    <div class="pin-box" :class="authForm.pinInput.length >= 5 ? 'active' : ''" x-text="authForm.pinInput[4] ? '●' : ''"></div>
+                    <div class="pin-box" :class="authForm.pinInput.length >= 6 ? 'active' : ''" x-text="authForm.pinInput[5] ? '●' : ''"></div>
+                </div>
+                
+                <input type="password" 
+                       x-ref="pinInput"
+                       maxlength="6" 
+                       x-model="authForm.pinInput" 
+                       inputmode="numeric"
+                       autocomplete="off"
+                       style="position: absolute; opacity: 0; inset: 0; width: 100%; height: 60px; cursor: pointer; z-index: 10;">
+                
+                <p style="font-size: 0.85rem; color: var(--text-light);">Masukkan 6 digit kode akses Anda</p>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" :disabled="authForm.pinInput.length < 6">MASUK KE SISTEM</button>
+            
+            <div style="margin-top: 20px; text-align: center;">
+                <a href="#" @click.prevent="authStep = 'register'" style="color: var(--primary); font-weight: 700; text-decoration: none; font-size: 1rem;">
+                    <i data-lucide="user-plus" style="width: 18px; vertical-align: middle; margin-right: 4px;"></i> DAFTAR AKUN BARU
+                </a>
+            </div>
+
+            <button type="button" @click="pinAdmin()" class="btn btn-admin" style="margin-top: 24px; background: var(--primary-dark); color: white; width: 100%;">
+                <i data-lucide="shield-check"></i> LOGIN CEPAT ADMIN
+            </button>
+
+            <div style="margin-top: 32px; text-align: center; border-top: 1px dashed #eee; padding-top: 24px;">
+                <button type="button" @click="authStep = 'login'" class="btn btn-ghost" style="font-size: 0.85rem; opacity: 0.7;">
+                    <i data-lucide="mail" style="width: 14px; margin-right: 4px;"></i> Gunakan Email & Password
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Login Screen (Secondary) -->
     <div class="auth-card" x-show="authStep === 'login'" x-transition>
         <div class="auth-header">
-            <h1>Selamat Datang</h1>
-            <p>Silakan masuk ke akun Anda</p>
+            <h1>Email Login</h1>
+            <p>Masuk menggunakan kredensial lengkap</p>
         </div>
         
         <form @submit.prevent="handleLogin">
@@ -25,12 +74,10 @@
                 <input type="password" class="form-input" x-model="authForm.password" required placeholder="••••••••">
             </div>
             <button type="submit" class="btn btn-primary">MASUK</button>
-            <button type="button" @click="loginAdmin()" class="btn btn-admin" style="margin-top: 12px; background: var(--primary-dark); color: white;">
-                <i data-lucide="shield-check"></i> LOGIN ADMIN
-            </button>
+            <button type="button" @click="authStep = 'pin'" class="btn btn-ghost">KEMBALI KE PIN</button>
             
-            <div style="margin-top: 24px; text-align: center; display: flex; flex-direction: column; gap: 8px;">
-                <a href="#" @click.prevent="authStep = 'register'" style="color: var(--primary); font-weight: 600; text-decoration: none; font-size: 0.9rem;">Belum punya akun? Daftar</a>
+            <div style="margin-top: 24px; text-align: center; display: flex; flex-direction: column; gap: 12px;">
+                <a href="#" @click.prevent="authStep = 'register'" style="color: var(--primary); font-weight: 700; text-decoration: none;">Belum punya akun? Daftar Sekarang</a>
                 <a href="#" @click.prevent="authStep = 'forgot'" style="color: var(--text-light); font-size: 0.85rem; text-decoration: none;">Lupa Password?</a>
             </div>
         </form>
@@ -40,7 +87,7 @@
     <div class="auth-card" x-show="authStep === 'register'" x-transition>
         <div class="auth-header">
             <h1>Buat Akun</h1>
-            <p>Lengkapi data untuk mendaftar</p>
+            <p>Daftarkan email dan PIN baru</p>
         </div>
         
         <form @submit.prevent="handleRegister">
@@ -57,7 +104,7 @@
                 <input type="password" class="form-input" maxlength="6" x-model="authForm.pin" required placeholder="123456">
             </div>
             <button type="submit" class="btn btn-primary">DAFTAR</button>
-            <button type="button" @click="authStep = 'login'" class="btn btn-ghost">KEMBALI</button>
+            <button type="button" @click="authStep = 'pin'" class="btn btn-ghost">KEMBALI</button>
         </form>
     </div>
 
@@ -70,7 +117,6 @@
             <p x-show="forgotState.otpVerified">Buat password baru</p>
         </div>
         
-        <!-- Step 1: Input Email -->
         <div x-show="!forgotState.otpSent">
             <div class="form-group">
                 <label>Email Terdaftar</label>
@@ -80,7 +126,6 @@
             <button @click="authStep = 'login'" class="btn btn-ghost">KEMBALI</button>
         </div>
 
-        <!-- Step 2: Input OTP -->
         <div x-show="forgotState.otpSent && !forgotState.otpVerified">
             <div class="form-group">
                 <label>Kode OTP</label>
@@ -90,7 +135,6 @@
             <button @click="forgotState.otpSent = false" class="btn btn-ghost">KEMBALI</button>
         </div>
 
-        <!-- Step 3: New Password -->
         <div x-show="forgotState.otpVerified">
             <div class="form-group">
                 <label>Password Baru</label>
@@ -102,45 +146,6 @@
             </div>
             <button @click="handleResetPassword" class="btn btn-primary">SIMPAN PASSWORD</button>
         </div>
-    </div>
-
-    <!-- PIN Verification Screen -->
-    <div class="auth-card" x-show="authStep === 'pin'" x-transition>
-        <div class="auth-header">
-            <h1>Masukkan PIN</h1>
-            <p>Sistem Keamanan Akses</p>
-        </div>
-        
-        <form @submit.prevent="handlePinVerify">
-            <div class="form-group" style="text-align: center; position: relative; margin-bottom: 32px;">
-                <div style="display: flex; gap: 12px; justify-content: center; margin-bottom: 24px;" @click="$refs.pinInput.focus()">
-                    <!-- Static boxes for reliability -->
-                    <div class="pin-box" :class="authForm.pinInput.length >= 1 ? 'active' : ''" x-text="authForm.pinInput[0] ? '●' : ''"></div>
-                    <div class="pin-box" :class="authForm.pinInput.length >= 2 ? 'active' : ''" x-text="authForm.pinInput[1] ? '●' : ''"></div>
-                    <div class="pin-box" :class="authForm.pinInput.length >= 3 ? 'active' : ''" x-text="authForm.pinInput[2] ? '●' : ''"></div>
-                    <div class="pin-box" :class="authForm.pinInput.length >= 4 ? 'active' : ''" x-text="authForm.pinInput[3] ? '●' : ''"></div>
-                    <div class="pin-box" :class="authForm.pinInput.length >= 5 ? 'active' : ''" x-text="authForm.pinInput[4] ? '●' : ''"></div>
-                    <div class="pin-box" :class="authForm.pinInput.length >= 6 ? 'active' : ''" x-text="authForm.pinInput[5] ? '●' : ''"></div>
-                </div>
-                
-                <input type="password" 
-                       x-ref="pinInput"
-                       maxlength="6" 
-                       x-model="authForm.pinInput" 
-                       inputmode="numeric"
-                       style="position: absolute; opacity: 0; inset: 0; width: 100%; height: 60px; cursor: pointer; z-index: 10;">
-                
-                <p style="font-size: 0.85rem; color: var(--text-light); margin-top: 20px;">Ketuk kotak di atas untuk memasukkan 6 digit PIN</p>
-            </div>
-            
-            <button type="submit" class="btn btn-primary" :disabled="authForm.pinInput.length < 6">VERIFIKASI PIN</button>
-            
-            <button type="button" @click="pinAdmin()" class="btn btn-admin" style="margin-top: 12px; background: var(--primary-dark); color: white;">
-                <i data-lucide="shield-check"></i> PIN ADMIN
-            </button>
-            
-            <button type="button" @click="logout()" class="btn btn-ghost">KELUAR</button>
-        </form>
     </div>
 </div>
 

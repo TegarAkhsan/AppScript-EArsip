@@ -13,7 +13,10 @@
         <table>
             <thead>
                 <tr>
-                    <th>No. Arsip</th>
+                    <th @click="sortSearchResults('nomor')" style="cursor: pointer; user-select: none;">
+                        No. Arsip 
+                        <i data-lucide="arrow-up-down" style="width: 14px; vertical-align: middle; margin-left: 4px; opacity: 0.5;"></i>
+                    </th>
                     <th>Nama Pemilik</th>
                     <th>Tanggal Simpan</th>
                     <th>Aksi</th>
@@ -38,8 +41,11 @@
                                 <button class="action-btn" title="Preview" @click="window.open(item.viewUrl, '_blank')">
                                     <i data-lucide="eye"></i>
                                 </button>
-                                <button class="action-btn" title="Edit Nama" @click="openEditModal(item)">
+                                <button class="action-btn" title="Edit" @click="openEditModal(item)">
                                     <i data-lucide="edit-3"></i>
+                                </button>
+                                <button class="action-btn" title="Hapus" @click="handleDelete(item)" style="color: var(--error);">
+                                    <i data-lucide="trash-2"></i>
                                 </button>
                                 <button class="action-btn" title="Download" @click="window.open(item.downloadUrl, '_blank')">
                                     <i data-lucide="download"></i>
