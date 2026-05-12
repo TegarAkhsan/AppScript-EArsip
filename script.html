@@ -34,6 +34,12 @@ function app() {
         init() {
             lucide.createIcons();
             
+            // Session Expiration Check on Load
+            if (this.isLoggedIn && (Date.now() - this.lastActivity > this.sessionTimeout)) {
+                this.logout('Sesi telah berakhir. Silakan login kembali.');
+                return;
+            }
+
             // Sync settings form with user data
             if (this.isLoggedIn) {
                 this.settingsForm.namaDesa = this.user.namaDesa || '';

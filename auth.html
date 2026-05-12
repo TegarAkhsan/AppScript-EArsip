@@ -1,10 +1,16 @@
 <div class="auth-wrapper">
+    <!-- Branding outside the card -->
+    <div class="logo-external" x-transition>
+        <img src="https://lh3.googleusercontent.com/d/1xWSr_1DXgjp_C-m7DdI-ieAx6yYtkSkG" alt="Logo BERBETA" style="height: 70px; width: auto; object-fit: contain;">
+        <div class="logo-text">
+            <h1>BERBETA</h1>
+            <p>Electronic Archive System</p>
+        </div>
+    </div>
+
     <!-- Login Screen -->
     <div class="auth-card" x-show="authStep === 'login'" x-transition>
         <div class="auth-header">
-            <div class="logo" style="justify-content: center; margin-bottom: 16px;">
-                <i data-lucide="archive"></i> E-ARSIP
-            </div>
             <h1>Selamat Datang</h1>
             <p>Silakan masuk ke akun Anda</p>
         </div>
@@ -101,11 +107,8 @@
     <!-- PIN Verification Screen -->
     <div class="auth-card" x-show="authStep === 'pin'" x-transition>
         <div class="auth-header">
-            <div class="card-icon bg-blue" style="margin: 0 auto 24px;">
-                <i data-lucide="lock"></i>
-            </div>
             <h1>Masukkan PIN</h1>
-            <p>Keamanan tambahan untuk akses sistem</p>
+            <p>Sistem Keamanan Akses</p>
         </div>
         
         <form @submit.prevent="handlePinVerify">

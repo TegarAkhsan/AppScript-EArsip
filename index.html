@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Arsip Digital</title>
+    <title>BERBETA</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Alpine.js -->
@@ -18,10 +18,10 @@
          x-show="showEditModal" 
          x-cloak 
          x-transition
-         style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 999999;">
+         style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(72, 60, 37, 0.4); backdrop-filter: blur(10px); z-index: 999999;">
         <div class="flat-card" 
              @click.away="showEditModal = false" 
-             style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 450px; padding: 40px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.1); margin: 0;">
+             style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 450px; padding: 40px; box-shadow: 0 30px 60px -12px rgba(72, 60, 37, 0.2); border: 1px solid rgba(96, 113, 47, 0.05); margin: 0;">
             <div style="margin-bottom: 32px; text-align: center;">
                 <div class="card-icon bg-blue" style="margin: 0 auto 16px;">
                     <i data-lucide="edit-3"></i>
@@ -89,7 +89,7 @@
                     <div x-show="view === 'search'">
                         <?!= include('arsip'); ?>
                     </div>
-                    <div x-show="view === 'settings-profile' || view === 'settings-security'">
+                    <div x-show="view.startsWith('settings-')">
                         <?!= include('settings'); ?>
                     </div>
                 </main>
