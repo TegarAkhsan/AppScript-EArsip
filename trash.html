@@ -1,0 +1,93 @@
+<div>
+    <div class="auth-header" style="text-align: left; margin-bottom: 24px;">
+        <p style="color: var(--text-light); font-size: 0.95rem;">
+            Berkas di dalam Sampah akan disimpan selama <strong>30 hari</strong> sebelum dihapus secara otomatis selamanya.
+        </p>
+    </div>
+
+    <div class="data-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>No. Arsip</th>
+                    <th>Nama Pemilik</th>
+                    <th>Tanggal Dihapus</th>
+                    <th>Sisa Waktu</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template x-if="trashItems.length === 0">
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 48px; color: var(--text-light);">
+                            <div style="margin-bottom: 12px; opacity: 0.5;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </div>
+                            Tempat sampah kosong.
+                        </td>
+                    </tr>
+                </template>
+                <template x-for="item in trashItems" :key="item.id">
+                    <tr>
+                        <td style="font-weight: 600;" x-text="item.nomor"></td>
+                        <td x-text="item.namaPemilik"></td>
+                        <td x-text="formatDate(item.deletedAt)"></td>
+                        <td>
+                            <span class="badge" 
+                                  :class="item.remainingDays <= 5 ? 'badge-danger' : 'badge-warning'" 
+                                  x-text="item.remainingDays + ' Hari lagi'">
+                            </span>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="action-btn" title="Pulihkan Berkas" @click="handleRestore(item)" style="color: var(--primary);">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v6h6"></path><path d="M3 13a9 9 0 1 0 3-7.7L3 8"></path></svg>
+                                </button>
+                                <button class="action-btn" title="Hapus Permanen" @click="handlePermDelete(item)" style="color: var(--error);">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+.badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+}
+.badge-warning {
+    background: #fef3c7;
+    color: #d97706;
+}
+.badge-danger {
+    background: #fee2e2;
+    color: #dc2626;
+}
+.action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-light);
+}
+.action-btn:hover {
+    background: #f1f5f9;
+    color: var(--primary);
+    border-color: var(--primary);
+}
+</style>

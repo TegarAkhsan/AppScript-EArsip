@@ -41,24 +41,5 @@
         <button class="btn btn-primary" @click="handleChangePin">UPDATE PIN</button>
     </div>
 
-    <!-- Change Password -->
-    <div class="flat-card" x-show="view === 'settings-pass'" x-transition style="width: 100%; max-width: none;">
-        <div class="auth-header" style="text-align: left;">
-            <h3>Ubah Password</h3>
-            <p>Perbarui kredensial login Anda</p>
-        </div>
-        <div class="form-group">
-            <label>Password Lama</label>
-            <input type="password" class="form-input" x-model="securityForm.oldPass">
-        </div>
-        <div class="form-group">
-            <label>Password Baru</label>
-            <input type="password" class="form-input" x-model="securityForm.newPass">
-        </div>
-        <div class="form-group">
-            <label>Konfirmasi Password Baru</label>
-            <input type="password" class="form-input" x-model="securityForm.confirmPass">
-        </div>
-        <button class="btn btn-primary" @click="handleChangePassword">UPDATE PASSWORD</button>
     </div>
 </div>

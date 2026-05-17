@@ -17,7 +17,7 @@
         <div class="form-group">
             <label>Pilih File (PDF)</label>
             <input type="file" id="file-upload" class="form-input" accept="application/pdf" @change="handleFileSelect" required>
-            <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 4px;" x-text="uploadForm.fileName ? 'Terpilih: ' + uploadForm.fileName : 'Maksimal 10MB'"></p>
+            <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 4px;" x-text="uploadForm.fileName ? 'Terpilih: ' + uploadForm.fileName : 'Maksimal 200KB'"></p>
         </div>
         
         <div style="display: flex; gap: 12px; margin-top: 32px;">

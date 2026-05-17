@@ -48,38 +48,6 @@
             <button type="button" @click="pinAdmin()" class="btn btn-admin" style="margin-top: 24px; background: var(--primary-dark); color: white; width: 100%;">
                 <i data-lucide="shield-check"></i> LOGIN CEPAT ADMIN
             </button>
-
-            <div style="margin-top: 32px; text-align: center; border-top: 1px dashed #eee; padding-top: 24px;">
-                <button type="button" @click="authStep = 'login'" class="btn btn-ghost" style="font-size: 0.85rem; opacity: 0.7;">
-                    <i data-lucide="mail" style="width: 14px; margin-right: 4px;"></i> Gunakan Email & Password
-                </button>
-            </div>
-        </form>
-    </div>
-
-    <!-- Login Screen (Secondary) -->
-    <div class="auth-card" x-show="authStep === 'login'" x-transition>
-        <div class="auth-header">
-            <h1>Email Login</h1>
-            <p>Masuk menggunakan kredensial lengkap</p>
-        </div>
-        
-        <form @submit.prevent="handleLogin">
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" class="form-input" x-model="authForm.email" required placeholder="nama@email.com">
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" class="form-input" x-model="authForm.password" required placeholder="••••••••">
-            </div>
-            <button type="submit" class="btn btn-primary">MASUK</button>
-            <button type="button" @click="authStep = 'pin'" class="btn btn-ghost">KEMBALI KE PIN</button>
-            
-            <div style="margin-top: 24px; text-align: center; display: flex; flex-direction: column; gap: 12px;">
-                <a href="#" @click.prevent="authStep = 'register'" style="color: var(--primary); font-weight: 700; text-decoration: none;">Belum punya akun? Daftar Sekarang</a>
-                <a href="#" @click.prevent="authStep = 'forgot'" style="color: var(--text-light); font-size: 0.85rem; text-decoration: none;">Lupa Password?</a>
-            </div>
         </form>
     </div>
 
@@ -93,11 +61,7 @@
         <form @submit.prevent="handleRegister">
             <div class="form-group">
                 <label>Email</label>
-                <input type="email" class="form-input" x-model="authForm.email" required>
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" class="form-input" x-model="authForm.password" required>
+                <input type="email" class="form-input" x-model="authForm.email" required placeholder="nama@email.com">
             </div>
             <div class="form-group">
                 <label>Buat PIN (6 Digit)</label>
@@ -106,46 +70,6 @@
             <button type="submit" class="btn btn-primary">DAFTAR</button>
             <button type="button" @click="authStep = 'pin'" class="btn btn-ghost">KEMBALI</button>
         </form>
-    </div>
-
-    <!-- Forgot Password Screen -->
-    <div class="auth-card" x-show="authStep === 'forgot'" x-transition>
-        <div class="auth-header">
-            <h1>Lupa Password</h1>
-            <p x-show="!forgotState.otpSent">Masukkan email untuk reset password</p>
-            <p x-show="forgotState.otpSent && !forgotState.otpVerified">Masukkan kode OTP dari email</p>
-            <p x-show="forgotState.otpVerified">Buat password baru</p>
-        </div>
-        
-        <div x-show="!forgotState.otpSent">
-            <div class="form-group">
-                <label>Email Terdaftar</label>
-                <input type="email" class="form-input" x-model="forgotForm.email" placeholder="nama@email.com">
-            </div>
-            <button @click="handleSendOtp" class="btn btn-primary">KIRIM OTP</button>
-            <button @click="authStep = 'login'" class="btn btn-ghost">KEMBALI</button>
-        </div>
-
-        <div x-show="forgotState.otpSent && !forgotState.otpVerified">
-            <div class="form-group">
-                <label>Kode OTP</label>
-                <input type="text" class="form-input" x-model="forgotForm.otp" placeholder="123456">
-            </div>
-            <button @click="forgotState.otpVerified = true" class="btn btn-primary">VERIFIKASI</button>
-            <button @click="forgotState.otpSent = false" class="btn btn-ghost">KEMBALI</button>
-        </div>
-
-        <div x-show="forgotState.otpVerified">
-            <div class="form-group">
-                <label>Password Baru</label>
-                <input type="password" class="form-input" x-model="forgotForm.newPassword">
-            </div>
-            <div class="form-group">
-                <label>Konfirmasi Password Baru</label>
-                <input type="password" class="form-input" x-model="forgotForm.confirmPassword">
-            </div>
-            <button @click="handleResetPassword" class="btn btn-primary">SIMPAN PASSWORD</button>
-        </div>
     </div>
 </div>
 

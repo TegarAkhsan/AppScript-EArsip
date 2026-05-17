@@ -52,25 +52,53 @@
          x-show="showDeleteModal" 
          x-cloak 
          x-transition
-         style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(220, 38, 38, 0.1); backdrop-filter: blur(10px); z-index: 999999;">
+         style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(72, 60, 37, 0.2); backdrop-filter: blur(10px); z-index: 999999;">
         <div class="flat-card" 
              @click.away="showDeleteModal = false" 
-             style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 400px; padding: 40px; box-shadow: 0 30px 60px -12px rgba(220, 38, 38, 0.2); border: 1px solid rgba(220, 38, 38, 0.1); margin: 0; text-align: center;">
+             style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 400px; padding: 40px; box-shadow: 0 30px 60px -12px rgba(72, 60, 37, 0.2); border: 1px solid rgba(96, 113, 47, 0.05); margin: 0; text-align: center;">
             <div style="margin-bottom: 24px;">
                 <div class="card-icon" style="margin: 0 auto 16px; background: #fee2e2; color: #dc2626;">
-                    <i data-lucide="alert-triangle"></i>
+                    <i data-lucide="trash-2"></i>
                 </div>
-                <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; color: var(--text);">Hapus Arsip?</h3>
+                <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; color: var(--text);">Pindahkan ke Sampah?</h3>
                 <p style="color: var(--text-light); font-size: 0.9rem;">
-                    Apakah Anda yakin ingin menghapus arsip <br>
-                    <span style="font-weight: 700; color: #dc2626;" x-text="deleteTarget?.nomor"></span>?
+                    Apakah Anda yakin ingin memindahkan arsip <br>
+                    <span style="font-weight: 700; color: #dc2626;" x-text="deleteTarget?.nomor"></span> ke Sampah?
                 </p>
-                <p style="font-size: 0.75rem; color: #94a3b8; margin-top: 12px;">Tindakan ini tidak dapat dibatalkan.</p>
+                <p style="font-size: 0.75rem; color: #94a3b8; margin-top: 12px;">Arsip dapat dipulihkan kembali dalam waktu 30 hari.</p>
             </div>
             
             <div style="display: flex; gap: 12px;">
                 <button class="btn" style="background: #f1f5f9; color: #475569; flex: 1;" @click="showDeleteModal = false">BATAL</button>
-                <button class="btn" style="background: #dc2626; color: white; flex: 1;" @click="confirmDelete">HAPUS DATA</button>
+                <button class="btn" style="background: #dc2626; color: white; flex: 1;" @click="confirmDelete">PINDAHKAN</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Permanent Delete Confirmation Modal -->
+    <div class="modal-overlay" 
+         x-show="showPermDeleteModal" 
+         x-cloak 
+         x-transition
+         style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(220, 38, 38, 0.25); backdrop-filter: blur(10px); z-index: 999999;">
+        <div class="flat-card" 
+             @click.away="showPermDeleteModal = false" 
+             style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 400px; padding: 40px; box-shadow: 0 30px 60px -12px rgba(220, 38, 38, 0.3); border: 1px solid rgba(220, 38, 38, 0.2); margin: 0; text-align: center;">
+            <div style="margin-bottom: 24px;">
+                <div class="card-icon" style="margin: 0 auto 16px; background: #fee2e2; color: #dc2626;">
+                    <i data-lucide="alert-triangle"></i>
+                </div>
+                <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; color: var(--text);">Hapus Permanen?</h3>
+                <p style="color: var(--text-light); font-size: 0.9rem;">
+                    Apakah Anda yakin ingin menghapus secara permanen arsip <br>
+                    <span style="font-weight: 700; color: #dc2626;" x-text="permDeleteTarget?.nomor"></span>?
+                </p>
+                <p style="font-size: 0.75rem; color: #ef4444; font-weight: 600; margin-top: 12px;">Tindakan ini tidak dapat dibatalkan & file Drive akan dihapus!</p>
+            </div>
+            
+            <div style="display: flex; gap: 12px;">
+                <button class="btn" style="background: #f1f5f9; color: #475569; flex: 1;" @click="showPermDeleteModal = false">BATAL</button>
+                <button class="btn" style="background: #dc2626; color: white; flex: 1;" @click="confirmPermDelete">HAPUS PERMANEN</button>
             </div>
         </div>
     </div>
@@ -121,6 +149,9 @@
                     </div>
                     <div x-show="view === 'search'">
                         <?!= include('arsip'); ?>
+                    </div>
+                    <div x-show="view === 'trash'">
+                        <?!= include('trash'); ?>
                     </div>
                     <div x-show="view.startsWith('settings-')">
                         <?!= include('settings'); ?>

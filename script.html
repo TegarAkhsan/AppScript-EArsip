@@ -29,11 +29,14 @@ function app() {
         editTargetNomor: '',
         showDeleteModal: false,
         deleteTarget: null,
+        showPermDeleteModal: false,
+        permDeleteTarget: null,
         sortOrder: 'desc', // 'asc' or 'desc'
+        trashItems: [],
 
         // Settings & Security
         settingsForm: { namaDesa: '', alamatDesa: '' },
-        securityForm: { oldPin: '', newPin: '', confirmPin: '', oldPass: '', newPass: '', confirmPass: '' },
+        securityForm: { oldPin: '', newPin: '', confirmPin: '' },
 
         init() {
             lucide.createIcons();
@@ -87,37 +90,14 @@ function app() {
                 this.searchQuery = ''; 
                 this.handleSearch();
             }
+            if (v === 'trash') {
+                this.handleGetTrash();
+            }
         },
 
         // Auth Actions
-        handleLogin() {
-            this.loading = true;
-            google.script.run
-                .withSuccessHandler(res => {
-                    this.loading = false;
-                    if (res.success) {
-                        this.user = res.user;
-                        this.isLoggedIn = true;
-                        this.authStep = 'pin';
-                        localStorage.setItem('e_arsip_user', JSON.stringify(res.user));
-                        this.showToast('Login berhasil! Masukkan PIN.', 'success');
-                        setTimeout(() => lucide.createIcons(), 50);
-                    } else {
-                        this.showToast(res.message, 'error');
-                    }
-                })
-                .withFailureHandler(err => this.handleError(err))
-                .login(this.authForm.email, this.authForm.password);
-        },
-
-        loginAdmin() {
-            this.authForm.email = 'admin@earsip.com';
-            this.authForm.password = 'admin123';
-            this.handleLogin();
-        },
-
         handleRegister() {
-            if (!this.authForm.email || !this.authForm.password || !this.authForm.pin) {
+            if (!this.authForm.email || !this.authForm.pin) {
                 return this.showToast('Lengkapi semua data', 'error');
             }
             if (this.authForm.pin.length !== 6) {
@@ -128,56 +108,15 @@ function app() {
                 .withSuccessHandler(res => {
                     this.loading = false;
                     if (res.success) {
-                        this.showToast('Pendaftaran berhasil! Silakan login.', 'success');
+                        this.showToast('Pendaftaran berhasil! Silakan masukkan PIN.', 'success');
                         this.authStep = 'pin';
-                        this.authForm.password = '';
                         this.authForm.pin = '';
                     } else {
                         this.showToast(res.message, 'error');
                     }
                 })
                 .withFailureHandler(err => this.handleError(err))
-                .register(this.authForm.email, this.authForm.password, this.authForm.pin);
-        },
-
-        handleSendOtp() {
-            if (!this.forgotForm.email) return this.showToast('Masukkan email', 'error');
-            this.loading = true;
-            google.script.run
-                .withSuccessHandler(res => {
-                    this.loading = false;
-                    if (res.success) {
-                        this.forgotState.otpSent = true;
-                        this.showToast('Kode OTP terkirim ke email.', 'success');
-                        // For demo: automatically fill OTP
-                        if (res.otp) this.forgotForm.otp = res.otp;
-                    } else {
-                        this.showToast(res.message, 'error');
-                    }
-                })
-                .withFailureHandler(err => this.handleError(err))
-                .sendOtp(this.forgotForm.email);
-        },
-
-        handleResetPassword() {
-            if (this.forgotForm.newPassword !== this.forgotForm.confirmPassword) {
-                return this.showToast('Password tidak cocok', 'error');
-            }
-            this.loading = true;
-            google.script.run
-                .withSuccessHandler(res => {
-                    this.loading = false;
-                    if (res.success) {
-                        this.showToast('Password berhasil diubah.', 'success');
-                        this.authStep = 'pin';
-                        this.forgotState = { otpSent: false, otpVerified: false };
-                        this.forgotForm = { email: '', otp: '', newPassword: '', confirmPassword: '' };
-                    } else {
-                        this.showToast(res.message, 'error');
-                    }
-                })
-                .withFailureHandler(err => this.handleError(err))
-                .resetPassword(this.forgotForm.email, this.forgotForm.otp, this.forgotForm.newPassword);
+                .register(this.authForm.email, '', this.authForm.pin);
         },
 
         handlePinVerify() {
@@ -216,7 +155,7 @@ function app() {
             this.isPinVerified = false;
             this.authStep = 'pin';
             this.user = { email: '' };
-            this.authForm = { email: '', password: '', pin: '', pinInput: '' };
+            this.authForm = { email: '', pin: '', pinInput: '' };
             if (msg) this.showToast(msg, 'info');
         },
 
@@ -224,6 +163,27 @@ function app() {
         handleFileSelect(e) {
             const file = e.target.files[0];
             if (!file) return;
+
+            // Enforce strictly PDF files
+            if (file.type !== 'application/pdf') {
+                this.showToast('Hanya file PDF yang diperbolehkan!', 'error');
+                e.target.value = '';
+                this.uploadForm.fileName = '';
+                this.uploadForm.mimeType = '';
+                this.uploadForm.data = '';
+                return;
+            }
+
+            // Enforce max size limit: 200KB
+            if (file.size > 200 * 1024) {
+                this.showToast('Ukuran PDF maksimal adalah 200KB', 'error');
+                e.target.value = '';
+                this.uploadForm.fileName = '';
+                this.uploadForm.mimeType = '';
+                this.uploadForm.data = '';
+                return;
+            }
+
             this.uploadForm.fileName = file.name;
             this.uploadForm.mimeType = file.type;
             const reader = new FileReader();
@@ -290,7 +250,7 @@ function app() {
                 .withSuccessHandler(res => {
                     this.loading = false;
                     if (res.success) {
-                        this.showToast('Arsip berhasil dihapus.', 'success');
+                        this.showToast(res.message || 'Arsip dipindahkan ke Sampah.', 'success');
                         this.handleSearch();
                     } else {
                         this.showToast(res.message, 'error');
@@ -298,6 +258,57 @@ function app() {
                 })
                 .withFailureHandler(err => this.handleError(err))
                 .deleteArsip(this.deleteTarget.id);
+        },
+
+        handleGetTrash() {
+            this.loading = true;
+            google.script.run
+                .withSuccessHandler(res => {
+                    this.loading = false;
+                    this.trashItems = res || [];
+                    setTimeout(() => lucide.createIcons(), 50);
+                })
+                .withFailureHandler(err => this.handleError(err))
+                .getTrashItems();
+        },
+
+        handleRestore(item) {
+            this.loading = true;
+            google.script.run
+                .withSuccessHandler(res => {
+                    this.loading = false;
+                    if (res.success) {
+                        this.showToast('Arsip berhasil dipulihkan.', 'success');
+                        this.handleGetTrash();
+                    } else {
+                        this.showToast(res.message, 'error');
+                    }
+                })
+                .withFailureHandler(err => this.handleError(err))
+                .restoreArsip(item.id);
+        },
+
+        handlePermDelete(item) {
+            this.permDeleteTarget = item;
+            this.showPermDeleteModal = true;
+            setTimeout(() => lucide.createIcons(), 50);
+        },
+
+        confirmPermDelete() {
+            this.showPermDeleteModal = false;
+            this.loading = true;
+            google.script.run
+                .withSuccessHandler(res => {
+                    this.loading = false;
+                    if (res.success) {
+                        this.showToast('Arsip dihapus secara permanen.', 'success');
+                        this.handleGetTrash();
+                    } else {
+                        this.showToast(res.message, 'error');
+                    }
+                })
+                .withFailureHandler(err => this.handleError(err))
+                .deletePermanently(this.permDeleteTarget.id);
         },
 
         sortSearchResults(key) {
@@ -373,21 +384,7 @@ function app() {
                 .changePin(this.user.email, this.securityForm.oldPin, this.securityForm.newPin);
         },
 
-        handleChangePassword() {
-            if (this.securityForm.newPass !== this.securityForm.confirmPass) return this.showToast('Password tidak cocok', 'error');
-            this.loading = true;
-            google.script.run
-                .withSuccessHandler(res => {
-                    this.loading = false;
-                    if (res.success) {
-                        this.showToast('Password diubah.', 'success');
-                        this.securityForm.oldPass = this.securityForm.newPass = this.securityForm.confirmPass = '';
-                    } else {
-                        this.showToast(res.message, 'error');
-                    }
-                })
-                .changePassword(this.user.email, this.securityForm.oldPass, this.securityForm.newPass);
-        },
+        // Removed password change handler
 
         formatDate(date) {
             if (!date) return '-';

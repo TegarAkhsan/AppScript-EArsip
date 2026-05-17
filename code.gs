@@ -7,7 +7,8 @@ const CONFIG = {
   SPREADSHEET_ID: '1_PoQaAhM-Tz0ojG4Qc1D23mnSKN0IfFiY-R8ZYN6nAE',
   FOLDER_ARCHIVE: '1X4D10qzOM9LjoirlW5xmk7HisVUtD-T0', // Using FOLDER_MASUK as default
   SHEET_USERS: 'Users',
-  SHEET_ARCHIVES: 'Archives'
+  SHEET_ARCHIVES: 'Archives',
+  SHEET_TRASH: 'Trash'
 };
 
 function doGet(e) {
@@ -29,9 +30,12 @@ function getDb() {
   const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
   
   // Setup Sheets
-  const sheets = [CONFIG.SHEET_USERS, CONFIG.SHEET_ARCHIVES];
+  const sheets = [CONFIG.SHEET_USERS, CONFIG.SHEET_ARCHIVES, CONFIG.SHEET_TRASH];
   sheets.forEach(name => {
-    let sheet = ss.getSheetByName(name);
+    // Robust search to avoid "sheet already exists" errors due to casing or trailing spaces
+    const targetName = name.trim().toLowerCase();
+    let sheet = ss.getSheets().find(s => s.getName().trim().toLowerCase() === targetName);
+    
     if (!sheet) {
       sheet = ss.insertSheet(name);
       if (name === CONFIG.SHEET_USERS) {
@@ -40,9 +44,19 @@ function getDb() {
         sheet.appendRow(['admin@earsip.com', 'admin123', '123456', 'Pusat Digital', 'Jl. Arsitektur No. 1', '']);
       } else if (name === CONFIG.SHEET_ARCHIVES) {
         sheet.appendRow(['ID', 'Timestamp', 'Nomor', 'Nama Pemilik', 'FileName', 'FileID', 'FileType']);
+      } else if (name === CONFIG.SHEET_TRASH) {
+        sheet.appendRow(['ID', 'Timestamp', 'Nomor', 'Nama Pemilik', 'FileName', 'FileID', 'FileType', 'DeletedAt']);
       }
     }
   });
+
+  // Auto-setup trash cleanup trigger
+  try {
+    setupTrashTrigger();
+  } catch (err) {
+    console.warn('Gagal setup trigger: ' + err.toString());
+  }
+
   return ss;
 }
 
@@ -271,24 +285,31 @@ function updateArsip(id, newNomor, newName) {
 function deleteArsip(id) {
   try {
     const ss = getDb();
-    const sheet = ss.getSheetByName(CONFIG.SHEET_ARCHIVES);
-    const data = sheet.getDataRange().getValues();
+    const sheetArchives = ss.getSheetByName(CONFIG.SHEET_ARCHIVES);
+    const sheetTrash = ss.getSheetByName(CONFIG.SHEET_TRASH);
+    const data = sheetArchives.getDataRange().getValues();
     
     for (let i = 1; i < data.length; i++) {
       if (data[i][0] === id) {
-        // Delete the file from Drive first
-        const fileId = data[i][5];
-        if (fileId) {
-          try {
-            DriveApp.getFileById(fileId).setTrashed(true);
-          } catch (err) {
-            console.warn('Gagal menghapus file di Drive:', err.toString());
-          }
-        }
+        const row = data[i];
         
-        sheet.deleteRow(i + 1);
+        // Append to trash sheet
+        const lastRow = sheetTrash.getLastRow();
+        sheetTrash.getRange(lastRow + 1, 1, 1, 8).setValues([[
+          row[0], // ID
+          row[1], // Timestamp
+          row[2], // Nomor
+          row[3], // Nama Pemilik
+          row[4], // FileName
+          row[5], // FileID
+          row[6], // FileType
+          new Date() // DeletedAt
+        ]]);
+        
+        // Delete from active archives
+        sheetArchives.deleteRow(i + 1);
         SpreadsheetApp.flush();
-        return { success: true };
+        return { success: true, message: 'Arsip berhasil dipindahkan ke Sampah.' };
       }
     }
     return { success: false, message: 'ID tidak ditemukan' };
@@ -344,12 +365,177 @@ function changePassword(email, oldPass, newPass) {
 }
 
 /**
- * HELPERS
+ * TRASH MANAGEMENT LOGIC
  */
-function getFolder() {
-  const folders = DriveApp.getFoldersByName('E-Arsip-Uploads');
-  if (folders.hasNext()) return folders.next();
-  return DriveApp.createFolder('E-Arsip-Uploads');
+function getTrashItems() {
+  try {
+    const ss = getDb();
+    const sheet = ss.getSheetByName(CONFIG.SHEET_TRASH);
+    if (!sheet) return [];
+    
+    const data = sheet.getDataRange().getValues();
+    if (data.length <= 1) return [];
+    
+    const results = [];
+    const now = new Date();
+    
+    // Read from newest to oldest
+    for (let i = data.length - 1; i >= 1; i--) {
+      const row = data[i];
+      if (!row[0]) continue;
+      
+      const deletedAtDate = row[7] instanceof Date ? row[7] : new Date(row[7]);
+      const diffTime = Math.abs(now - deletedAtDate);
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      const remainingDays = Math.max(0, 30 - diffDays);
+      
+      results.push({
+        id: row[0].toString(),
+        timestamp: row[1] instanceof Date ? row[1].toISOString() : row[1].toString(),
+        nomor: (row[2] || "").toString() || '-',
+        namaPemilik: (row[3] || "").toString() || '-',
+        fileName: (row[4] || "").toString() || 'Tanpa Nama',
+        fileId: row[5],
+        mimeType: row[6],
+        deletedAt: deletedAtDate.toISOString(),
+        remainingDays: remainingDays
+      });
+    }
+    return results;
+  } catch (e) {
+    console.error('getTrashItems error:', e.toString());
+    return [];
+  }
+}
+
+function restoreArsip(id) {
+  try {
+    const ss = getDb();
+    const sheetArchives = ss.getSheetByName(CONFIG.SHEET_ARCHIVES);
+    const sheetTrash = ss.getSheetByName(CONFIG.SHEET_TRASH);
+    const data = sheetTrash.getDataRange().getValues();
+    
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === id) {
+        const row = data[i];
+        
+        // Append back to Archives sheet
+        const lastRow = sheetArchives.getLastRow();
+        sheetArchives.getRange(lastRow + 1, 1, 1, 7).setValues([[
+          row[0], // ID
+          row[1], // Timestamp
+          row[2], // Nomor
+          row[3], // Nama Pemilik
+          row[4], // FileName
+          row[5], // FileID
+          row[6]  // FileType
+        ]]);
+        
+        // Remove from Trash sheet
+        sheetTrash.deleteRow(i + 1);
+        SpreadsheetApp.flush();
+        return { success: true };
+      }
+    }
+    return { success: false, message: 'ID tidak ditemukan di Sampah' };
+  } catch (e) {
+    return { success: false, message: e.toString() };
+  }
+}
+
+function deletePermanently(id) {
+  try {
+    const ss = getDb();
+    const sheetTrash = ss.getSheetByName(CONFIG.SHEET_TRASH);
+    const data = sheetTrash.getDataRange().getValues();
+    
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0] === id) {
+        // Delete the file from Drive
+        const fileId = data[i][5];
+        if (fileId) {
+          try {
+            DriveApp.getFileById(fileId).setTrashed(true);
+          } catch (err) {
+            console.warn('Gagal menghapus file di Drive:', err.toString());
+          }
+        }
+        
+        // Remove from Trash sheet
+        sheetTrash.deleteRow(i + 1);
+        SpreadsheetApp.flush();
+        return { success: true };
+      }
+    }
+    return { success: false, message: 'ID tidak ditemukan di Sampah' };
+  } catch (e) {
+    return { success: false, message: e.toString() };
+  }
+}
+
+function cleanupTrash() {
+  try {
+    const ss = getDb();
+    const sheetTrash = ss.getSheetByName(CONFIG.SHEET_TRASH);
+    if (!sheetTrash) return;
+    
+    const data = sheetTrash.getDataRange().getValues();
+    if (data.length <= 1) return;
+    
+    const now = new Date();
+    let rowsDeleted = 0;
+    
+    // Process from bottom to top so that index deletion doesn't shift unprocessed rows
+    for (let i = data.length - 1; i >= 1; i--) {
+      const row = data[i];
+      if (!row[0]) continue;
+      
+      const deletedAtDate = row[7] instanceof Date ? row[7] : new Date(row[7]);
+      const diffTime = Math.abs(now - deletedAtDate);
+      const diffDays = diffTime / (1000 * 60 * 60 * 24);
+      
+      if (diffDays > 30) {
+        // Delete file from Drive
+        const fileId = row[5];
+        if (fileId) {
+          try {
+            DriveApp.getFileById(fileId).setTrashed(true);
+          } catch (err) {
+            console.warn('Gagal menghapus file Drive saat cleanup:', err.toString());
+          }
+        }
+        
+        // Delete row
+        sheetTrash.deleteRow(i + 1);
+        rowsDeleted++;
+      }
+    }
+    
+    if (rowsDeleted > 0) {
+      SpreadsheetApp.flush();
+      console.log(`Cleaned up ${rowsDeleted} trash items older than 30 days.`);
+    }
+  } catch (e) {
+    console.error('cleanupTrash error:', e.toString());
+  }
+}
+
+function setupTrashTrigger() {
+  const triggers = ScriptApp.getProjectTriggers();
+  let hasTrigger = false;
+  for (let i = 0; i < triggers.length; i++) {
+    if (triggers[i].getHandlerFunction() === 'cleanupTrash') {
+      hasTrigger = true;
+      break;
+    }
+  }
+  
+  if (!hasTrigger) {
+    ScriptApp.newTrigger('cleanupTrash')
+      .timeBased()
+      .everyDays(1)
+      .create();
+  }
 }
 
 function getFolder() {
