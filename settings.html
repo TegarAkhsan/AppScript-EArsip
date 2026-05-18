@@ -17,7 +17,7 @@
             <label>Alamat Desa</label>
             <textarea class="form-input" x-model="settingsForm.alamatDesa" rows="3"></textarea>
         </div>
-        <button class="btn btn-primary" @click="handleUpdateProfile">SIMPAN PERUBAHAN</button>
+        <button class="btn btn-primary" @click="handleUpdateProfile" :disabled="loading">SIMPAN PERUBAHAN</button>
     </div>
 
     <!-- Change PIN -->
@@ -38,7 +38,7 @@
             <label>Konfirmasi PIN Baru</label>
             <input type="password" class="form-input" x-model="securityForm.confirmPin" maxlength="6">
         </div>
-        <button class="btn btn-primary" @click="handleChangePin">UPDATE PIN</button>
+        <button class="btn btn-primary" @click="handleChangePin" :disabled="loading">UPDATE PIN</button>
     </div>
 
     <!-- Change Password -->
@@ -59,6 +59,6 @@
             <label>Konfirmasi Password Baru</label>
             <input type="password" class="form-input" x-model="passwordForm.confirmPassword" required placeholder="••••••••">
         </div>
-        <button class="btn btn-primary" @click="handleChangePassword">UPDATE PASSWORD</button>
+        <button class="btn btn-primary" @click="handleChangePassword" :disabled="loading">UPDATE PASSWORD</button>
     </div>
 </div>

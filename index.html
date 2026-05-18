@@ -41,8 +41,8 @@
             </div>
             
             <div style="display: flex; gap: 16px; margin-top: 40px;">
-                <button class="btn" style="background: rgba(255,255,255,0.05); color: var(--text); flex: 1;" @click="showEditModal = false">BATAL</button>
-                <button class="btn btn-primary" style="flex: 2;" @click="saveEdit">SIMPAN PERUBAHAN</button>
+                <button class="btn" style="background: rgba(255,255,255,0.05); color: var(--text); flex: 1;" @click="showEditModal = false" :disabled="loading">BATAL</button>
+                <button class="btn btn-primary" style="flex: 2;" @click="saveEdit" :disabled="loading">SIMPAN PERUBAHAN</button>
             </div>
         </div>
     </div>
@@ -69,8 +69,8 @@
             </div>
             
             <div style="display: flex; gap: 12px;">
-                <button class="btn" style="background: #f1f5f9; color: #475569; flex: 1;" @click="showDeleteModal = false">BATAL</button>
-                <button class="btn" style="background: #dc2626; color: white; flex: 1;" @click="confirmDelete">PINDAHKAN</button>
+                <button class="btn" style="background: #f1f5f9; color: #475569; flex: 1;" @click="showDeleteModal = false" :disabled="loading">BATAL</button>
+                <button class="btn" style="background: #dc2626; color: white; flex: 1;" @click="confirmDelete" :disabled="loading">PINDAHKAN</button>
             </div>
         </div>
     </div>
@@ -97,8 +97,8 @@
             </div>
             
             <div style="display: flex; gap: 12px;">
-                <button class="btn" style="background: #f1f5f9; color: #475569; flex: 1;" @click="showPermDeleteModal = false">BATAL</button>
-                <button class="btn" style="background: #dc2626; color: white; flex: 1;" @click="confirmPermDelete">HAPUS PERMANEN</button>
+                <button class="btn" style="background: #f1f5f9; color: #475569; flex: 1;" @click="showPermDeleteModal = false" :disabled="loading">BATAL</button>
+                <button class="btn" style="background: #dc2626; color: white; flex: 1;" @click="confirmPermDelete" :disabled="loading">HAPUS PERMANEN</button>
             </div>
         </div>
     </div>

@@ -37,7 +37,7 @@
                 <p style="font-size: 0.85rem; color: var(--text-light);">Masukkan 6 digit kode akses Anda</p>
             </div>
             
-            <button type="submit" class="btn btn-primary" :disabled="authForm.pinInput.length < 6">MASUK KE SISTEM</button>
+            <button type="submit" class="btn btn-primary" :disabled="authForm.pinInput.length < 6 || loading">MASUK KE SISTEM</button>
             
             <div style="margin-top: 20px; text-align: center;">
                 <a href="#" @click.prevent="authStep = 'register'" style="color: var(--primary); font-weight: 700; text-decoration: none; font-size: 1rem;">
@@ -45,7 +45,7 @@
                 </a>
             </div>
 
-            <button type="button" @click="pinAdmin()" class="btn btn-admin" style="margin-top: 24px; background: var(--primary-dark); color: white; width: 100%;">
+            <button type="button" @click="pinAdmin()" class="btn btn-admin" style="margin-top: 24px; background: var(--primary-dark); color: white; width: 100%;" :disabled="loading">
                 <i data-lucide="shield-check"></i> LOGIN CEPAT ADMIN
             </button>
         </form>
@@ -71,8 +71,8 @@
                 <label>Buat PIN (6 Digit)</label>
                 <input type="password" class="form-input" maxlength="6" x-model="authForm.pin" required placeholder="123456">
             </div>
-            <button type="submit" class="btn btn-primary">DAFTAR</button>
-            <button type="button" @click="authStep = 'pin'" class="btn btn-ghost" style="margin-top: 12px;">KEMBALI</button>
+            <button type="submit" class="btn btn-primary" :disabled="loading">DAFTAR</button>
+            <button type="button" @click="authStep = 'pin'" class="btn btn-ghost" style="margin-top: 12px;" :disabled="loading">KEMBALI</button>
         </form>
     </div>
 </div>
