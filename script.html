@@ -144,11 +144,6 @@ function app() {
                 .loginWithPin(this.authForm.pinInput);
         },
 
-        pinAdmin() {
-            this.authForm.pinInput = '123456';
-            this.handlePinVerify();
-        },
-
         logout(msg) {
             localStorage.removeItem('e_arsip_user');
             localStorage.removeItem('e_arsip_last_activity');
