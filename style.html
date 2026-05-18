@@ -491,7 +491,9 @@ body {
     background: var(--surface);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow);
-    overflow: hidden;
+    overflow-x: auto;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
 }
 
 table {
@@ -564,13 +566,75 @@ tr:hover td {
 /* Animations */
 [x-cloak] { display: none !important; }
 
+/* Sidebar Overlay */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(72, 60, 37, 0.2);
+    backdrop-filter: blur(8px);
+    z-index: 99999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.sidebar-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
     .content-area { padding: 0; }
     .top-nav { padding: 20px 24px; }
     .main-content { padding: 24px 24px; }
-    .sidebar { position: fixed; left: -300px; z-index: 100; transition: 0.4s; }
+    .sidebar { position: fixed; left: -300px; z-index: 100000; transition: 0.4s; }
     .sidebar.mobile-open { left: 0; }
     .hamburger-btn { display: flex; background: white; border: 1px solid #eee; padding: 10px; border-radius: 12px; }
+}
+
+@media (max-width: 768px) {
+    .search-box {
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px;
+    }
+    .search-box button {
+        width: 100% !important;
+        padding: 16px !important;
+    }
+    .flat-card {
+        padding: 24px 16px;
+    }
+    .auth-card {
+        padding: 36px 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pin-box {
+        width: 40px !important;
+        height: 52px !important;
+        font-size: 1.4rem !important;
+        border-radius: 12px !important;
+    }
+    .grid-menu {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    .menu-card {
+        padding: 24px !important;
+    }
+    .card-icon {
+        width: 56px !important;
+        height: 56px !important;
+        font-size: 24px !important;
+        margin-bottom: 16px !important;
+    }
+    .top-nav {
+        padding: 16px;
+    }
+    .main-content {
+        padding: 16px;
+    }
 }
 </style>
