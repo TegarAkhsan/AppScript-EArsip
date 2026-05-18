@@ -37,6 +37,7 @@ function app() {
         // Settings & Security
         settingsForm: { namaDesa: '', alamatDesa: '' },
         securityForm: { oldPin: '', newPin: '', confirmPin: '' },
+        passwordForm: { oldPassword: '', newPassword: '', confirmPassword: '' },
 
         init() {
             lucide.createIcons();
@@ -97,7 +98,7 @@ function app() {
 
         // Auth Actions
         handleRegister() {
-            if (!this.authForm.email || !this.authForm.pin) {
+            if (!this.authForm.email || !this.authForm.password || !this.authForm.pin) {
                 return this.showToast('Lengkapi semua data', 'error');
             }
             if (this.authForm.pin.length !== 6) {
@@ -111,12 +112,13 @@ function app() {
                         this.showToast('Pendaftaran berhasil! Silakan masukkan PIN.', 'success');
                         this.authStep = 'pin';
                         this.authForm.pin = '';
+                        this.authForm.password = '';
                     } else {
                         this.showToast(res.message, 'error');
                     }
                 })
                 .withFailureHandler(err => this.handleError(err))
-                .register(this.authForm.email, '', this.authForm.pin);
+                .register(this.authForm.email, this.authForm.password, this.authForm.pin);
         },
 
         handlePinVerify() {
@@ -155,7 +157,7 @@ function app() {
             this.isPinVerified = false;
             this.authStep = 'pin';
             this.user = { email: '' };
-            this.authForm = { email: '', pin: '', pinInput: '' };
+            this.authForm = { email: '', password: '', pin: '', pinInput: '' };
             if (msg) this.showToast(msg, 'info');
         },
 
@@ -384,7 +386,27 @@ function app() {
                 .changePin(this.user.email, this.securityForm.oldPin, this.securityForm.newPin);
         },
 
-        // Removed password change handler
+        handleChangePassword() {
+            if (!this.passwordForm.oldPassword || !this.passwordForm.newPassword || !this.passwordForm.confirmPassword) {
+                return this.showToast('Lengkapi semua data', 'error');
+            }
+            if (this.passwordForm.newPassword !== this.passwordForm.confirmPassword) {
+                return this.showToast('Password baru tidak cocok', 'error');
+            }
+            this.loading = true;
+            google.script.run
+                .withSuccessHandler(res => {
+                    this.loading = false;
+                    if (res.success) {
+                        this.showToast('Password berhasil diubah.', 'success');
+                        this.passwordForm.oldPassword = this.passwordForm.newPassword = this.passwordForm.confirmPassword = '';
+                    } else {
+                        this.showToast(res.message, 'error');
+                    }
+                })
+                .withFailureHandler(err => this.handleError(err))
+                .changePassword(this.user.email, this.passwordForm.oldPassword, this.passwordForm.newPassword);
+        },
 
         formatDate(date) {
             if (!date) return '-';

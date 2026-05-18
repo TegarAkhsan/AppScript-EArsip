@@ -4,8 +4,8 @@
  */
 
 const CONFIG = {
-  SPREADSHEET_ID: '1_PoQaAhM-Tz0ojG4Qc1D23mnSKN0IfFiY-R8ZYN6nAE',
-  FOLDER_ARCHIVE: '1X4D10qzOM9LjoirlW5xmk7HisVUtD-T0', // Using FOLDER_MASUK as default
+  SPREADSHEET_ID: '1G5iYszV9KzgULFlaSOCezCjlJJjgJbbvK5XIlwncKw0',
+  FOLDER_ARCHIVE: '1SNNDpos8lGTUuXaAiM7vOKywfu91W7O_', // Using FOLDER_MASUK as default
   SHEET_USERS: 'Users',
   SHEET_ARCHIVES: 'Archives',
   SHEET_TRASH: 'Trash'
@@ -40,12 +40,25 @@ function getDb() {
       sheet = ss.insertSheet(name);
       if (name === CONFIG.SHEET_USERS) {
         sheet.appendRow(['Email', 'Password', 'PIN', 'Nama Desa', 'Alamat Desa', 'OTP']);
-        // Add Default Admin
-        sheet.appendRow(['admin@earsip.com', 'admin123', '123456', 'Pusat Digital', 'Jl. Arsitektur No. 1', '']);
+        // Add Default Admin (Using Desa Berbek as requested)
+        sheet.appendRow(['admin@earsip.com', 'admin123', '123456', 'Desa Berbek', 'Jl. Raya Berbek No. 1', '']);
       } else if (name === CONFIG.SHEET_ARCHIVES) {
         sheet.appendRow(['ID', 'Timestamp', 'Nomor', 'Nama Pemilik', 'FileName', 'FileID', 'FileType']);
       } else if (name === CONFIG.SHEET_TRASH) {
         sheet.appendRow(['ID', 'Timestamp', 'Nomor', 'Nama Pemilik', 'FileName', 'FileID', 'FileType', 'DeletedAt']);
+      }
+    } else if (name === CONFIG.SHEET_USERS) {
+      // Auto-migrate old default admin names to "Desa Berbek" in the active sheet
+      try {
+        const data = sheet.getDataRange().getValues();
+        for (let i = 1; i < data.length; i++) {
+          if (data[i][0] === 'admin@earsip.com' && (data[i][3] === 'Pusat Digital' || data[i][3] === 'ADMIN BERBETA')) {
+            sheet.getRange(i + 1, 4).setValue('Desa Berbek');
+            sheet.getRange(i + 1, 5).setValue('Jl. Raya Berbek No. 1');
+          }
+        }
+      } catch (err) {
+        console.warn('Gagal auto-update nama desa: ' + err.toString());
       }
     }
   });
@@ -86,7 +99,7 @@ function register(email, password, pin) {
     if (data[i][0] === email) return { success: false, message: 'Email sudah terdaftar' };
   }
   
-  sheet.appendRow([email, password, pin, 'Desa Contoh', 'Alamat Contoh', '']);
+  sheet.appendRow([email, password, pin, 'Desa Berbek', 'Jl. Raya Berbek No. 1', '']);
   return { success: true };
 }
 
@@ -168,7 +181,7 @@ function uploadArsip(obj) {
     
     // Attempt to set sharing, but don't crash if organization policies restrict it
     try {
-      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.EDIT);
     } catch (e) {
       console.warn('Gagal mengatur sharing: ' + e.toString());
     }

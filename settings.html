@@ -41,5 +41,24 @@
         <button class="btn btn-primary" @click="handleChangePin">UPDATE PIN</button>
     </div>
 
+    <!-- Change Password -->
+    <div class="flat-card" x-show="view === 'settings-password'" x-transition style="width: 100%; max-width: none; margin-top: 24px;">
+        <div class="auth-header" style="text-align: left;">
+            <h3>Ubah Password</h3>
+            <p>Perbarui kata sandi akun Anda</p>
+        </div>
+        <div class="form-group">
+            <label>Password Lama</label>
+            <input type="password" class="form-input" x-model="passwordForm.oldPassword" required placeholder="••••••••">
+        </div>
+        <div class="form-group">
+            <label>Password Baru</label>
+            <input type="password" class="form-input" x-model="passwordForm.newPassword" required placeholder="••••••••">
+        </div>
+        <div class="form-group">
+            <label>Konfirmasi Password Baru</label>
+            <input type="password" class="form-input" x-model="passwordForm.confirmPassword" required placeholder="••••••••">
+        </div>
+        <button class="btn btn-primary" @click="handleChangePassword">UPDATE PASSWORD</button>
     </div>
 </div>

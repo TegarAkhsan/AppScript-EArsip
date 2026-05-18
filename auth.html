@@ -1,7 +1,7 @@
 <div class="auth-wrapper">
     <!-- Branding outside the card -->
     <div class="logo-external" x-transition>
-        <img src="https://lh3.googleusercontent.com/d/1xWSr_1DXgjp_C-m7DdI-ieAx6yYtkSkG" alt="Logo BERBETA" style="height: 70px; width: auto; object-fit: contain;">
+        <img src="https://lh3.googleusercontent.com/d/1KfTtZCBQNOFMyymy3DYImPUckJD5lqNp" alt="Logo BERBETA" style="height: 70px; width: auto; object-fit: contain;">
         <div class="logo-text">
             <h1>BERBETA</h1>
             <p>Berbek Berkas Tanah Digital</p>
@@ -55,7 +55,7 @@
     <div class="auth-card" x-show="authStep === 'register'" x-transition>
         <div class="auth-header">
             <h1>Buat Akun</h1>
-            <p>Daftarkan email dan PIN baru</p>
+            <p>Daftarkan email, password dan PIN baru</p>
         </div>
         
         <form @submit.prevent="handleRegister">
@@ -64,11 +64,15 @@
                 <input type="email" class="form-input" x-model="authForm.email" required placeholder="nama@email.com">
             </div>
             <div class="form-group">
+                <label>Password</label>
+                <input type="password" class="form-input" x-model="authForm.password" required placeholder="••••••••">
+            </div>
+            <div class="form-group">
                 <label>Buat PIN (6 Digit)</label>
                 <input type="password" class="form-input" maxlength="6" x-model="authForm.pin" required placeholder="123456">
             </div>
             <button type="submit" class="btn btn-primary">DAFTAR</button>
-            <button type="button" @click="authStep = 'pin'" class="btn btn-ghost">KEMBALI</button>
+            <button type="button" @click="authStep = 'pin'" class="btn btn-ghost" style="margin-top: 12px;">KEMBALI</button>
         </form>
     </div>
 </div>

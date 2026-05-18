@@ -1,6 +1,6 @@
 <aside class="sidebar" :class="showMobileMenu ? 'mobile-open' : ''">
     <div class="logo">
-        <img src="https://lh3.googleusercontent.com/d/1xWSr_1DXgjp_C-m7DdI-ieAx6yYtkSkG" alt="Logo BERBETA" style="height: 70px; width: auto; object-fit: contain;">
+        <img src="https://lh3.googleusercontent.com/d/1KfTtZCBQNOFMyymy3DYImPUckJD5lqNp" alt="Logo BERBETA" style="height: 70px; width: auto; object-fit: contain;">
         <div class="logo-text">
             <h1>BERBETA</h1>
             <p>Berbek Berkas Tanah Digital</p>
@@ -33,6 +33,9 @@
                 </div>
                 <div class="nav-item sub-item" :class="view === 'settings-pin' ? 'active' : ''" @click="setView('settings-pin', 'Ubah PIN')">
                     Ubah PIN
+                </div>
+                <div class="nav-item sub-item" :class="view === 'settings-password' ? 'active' : ''" @click="setView('settings-password', 'Ubah Password')">
+                    Ubah Password
                 </div>
             </div>
         </div>
