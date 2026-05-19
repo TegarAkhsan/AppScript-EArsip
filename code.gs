@@ -41,24 +41,31 @@ function getDb() {
       if (name === CONFIG.SHEET_USERS) {
         sheet.appendRow(['Email', 'Password', 'PIN', 'Nama Desa', 'Alamat Desa', 'OTP']);
         // Add Default Admin (Using Desa Berbek as requested)
-        sheet.appendRow(['admin@earsip.com', 'admin123', '123456', 'Desa Berbek', 'Jl. Raya Berbek No. 1', '']);
+        sheet.appendRow(['pemdesberbek4@gmail.com', 'pemerintahdesaberbek4', '123456', 'Desa Berbek', 'Jl. Raya Berbek No. 1', '']);
       } else if (name === CONFIG.SHEET_ARCHIVES) {
         sheet.appendRow(['ID', 'Timestamp', 'Nomor', 'Nama Pemilik', 'FileName', 'FileID', 'FileType']);
       } else if (name === CONFIG.SHEET_TRASH) {
         sheet.appendRow(['ID', 'Timestamp', 'Nomor', 'Nama Pemilik', 'FileName', 'FileID', 'FileType', 'DeletedAt']);
       }
     } else if (name === CONFIG.SHEET_USERS) {
-      // Auto-migrate old default admin names to "Desa Berbek" in the active sheet
+      // Auto-migrate to the requested admin user (pemdesberbek4@gmail.com) and ensure credentials are correct
       try {
         const data = sheet.getDataRange().getValues();
+        let foundNewAdmin = false;
         for (let i = 1; i < data.length; i++) {
-          if (data[i][0] === 'admin@earsip.com' && (data[i][3] === 'Pusat Digital' || data[i][3] === 'ADMIN BERBETA')) {
+          if (data[i][0] === 'pemdesberbek4@gmail.com') {
+            foundNewAdmin = true;
+            sheet.getRange(i + 1, 2).setValue('pemerintahdesaberbek4');
+            sheet.getRange(i + 1, 3).setValue('123456');
             sheet.getRange(i + 1, 4).setValue('Desa Berbek');
             sheet.getRange(i + 1, 5).setValue('Jl. Raya Berbek No. 1');
           }
         }
+        if (!foundNewAdmin) {
+          sheet.appendRow(['pemdesberbek4@gmail.com', 'pemerintahdesaberbek4', '123456', 'Desa Berbek', 'Jl. Raya Berbek No. 1', '']);
+        }
       } catch (err) {
-        console.warn('Gagal auto-update nama desa: ' + err.toString());
+        console.warn('Gagal auto-update admin: ' + err.toString());
       }
     }
   });
@@ -90,17 +97,7 @@ function login(email, password) {
 }
 
 function register(email, password, pin) {
-  const ss = getDb();
-  const sheet = ss.getSheetByName(CONFIG.SHEET_USERS);
-  const data = sheet.getDataRange().getValues();
-  
-  // Check if exists
-  for (let i = 1; i < data.length; i++) {
-    if (data[i][0] === email) return { success: false, message: 'Email sudah terdaftar' };
-  }
-  
-  sheet.appendRow([email, password, pin, 'Desa Berbek', 'Jl. Raya Berbek No. 1', '']);
-  return { success: true };
+  return { success: false, message: 'Pendaftaran akun baru telah dinonaktifkan.' };
 }
 
 function verifyPin(email, pin) {

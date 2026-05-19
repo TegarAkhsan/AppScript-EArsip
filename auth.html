@@ -38,37 +38,6 @@
             </div>
             
             <button type="submit" class="btn btn-primary" :disabled="authForm.pinInput.length < 6 || loading">MASUK KE SISTEM</button>
-            
-            <div style="margin-top: 20px; text-align: center;">
-                <a href="#" @click.prevent="authStep = 'register'" style="color: var(--primary); font-weight: 700; text-decoration: none; font-size: 1rem;">
-                    <i data-lucide="user-plus" style="width: 18px; vertical-align: middle; margin-right: 4px;"></i> DAFTAR AKUN BARU
-                </a>
-            </div>
-        </form>
-    </div>
-
-    <!-- Register Screen -->
-    <div class="auth-card" x-show="authStep === 'register'" x-transition>
-        <div class="auth-header">
-            <h1>Buat Akun</h1>
-            <p>Daftarkan email, password dan PIN baru</p>
-        </div>
-        
-        <form @submit.prevent="handleRegister">
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" class="form-input" x-model="authForm.email" required placeholder="nama@email.com">
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" class="form-input" x-model="authForm.password" required placeholder="••••••••">
-            </div>
-            <div class="form-group">
-                <label>Buat PIN (6 Digit)</label>
-                <input type="password" class="form-input" maxlength="6" x-model="authForm.pin" required placeholder="123456">
-            </div>
-            <button type="submit" class="btn btn-primary" :disabled="loading">DAFTAR</button>
-            <button type="button" @click="authStep = 'pin'" class="btn btn-ghost" style="margin-top: 12px;" :disabled="loading">KEMBALI</button>
         </form>
     </div>
 </div>

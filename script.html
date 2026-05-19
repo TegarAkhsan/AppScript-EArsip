@@ -42,6 +42,12 @@ function app() {
         init() {
             lucide.createIcons();
             
+            // Force logout if logged in as the old admin session
+            if (this.isLoggedIn && this.user.email === 'admin@earsip.com') {
+                this.logout('Sesi admin lama telah dinonaktifkan. Silakan masuk kembali.');
+                return;
+            }
+            
             // Session Expiration Check on Load
             if (this.isLoggedIn && (Date.now() - this.lastActivity > this.sessionTimeout)) {
                 this.logout('Sesi telah berakhir. Silakan login kembali.');
