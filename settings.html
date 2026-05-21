@@ -26,17 +26,35 @@
             <h3>Ubah PIN</h3>
             <p>Amankan akses dengan PIN baru</p>
         </div>
-        <div class="form-group">
+        <div class="form-group" x-data="{ show: false }">
             <label>PIN Lama</label>
-            <input type="password" class="form-input" x-model="securityForm.oldPin" maxlength="6">
+            <div style="position: relative;">
+                <input :type="show ? 'text' : 'password'" class="form-input" x-model="securityForm.oldPin" maxlength="6" style="padding-right: 50px;">
+                <button type="button" @click="show = !show" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer; color: var(--text-light); transition: all 0.2s; display: flex; align-items: center; justify-content: center;" :style="show ? 'color: var(--primary);' : ''">
+                    <i x-show="!show" data-lucide="eye" style="width: 20px; height: 20px;"></i>
+                    <i x-show="show" data-lucide="eye-off" style="width: 20px; height: 20px;"></i>
+                </button>
+            </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" x-data="{ show: false }">
             <label>PIN Baru</label>
-            <input type="password" class="form-input" x-model="securityForm.newPin" maxlength="6">
+            <div style="position: relative;">
+                <input :type="show ? 'text' : 'password'" class="form-input" x-model="securityForm.newPin" maxlength="6" style="padding-right: 50px;">
+                <button type="button" @click="show = !show" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer; color: var(--text-light); transition: all 0.2s; display: flex; align-items: center; justify-content: center;" :style="show ? 'color: var(--primary);' : ''">
+                    <i x-show="!show" data-lucide="eye" style="width: 20px; height: 20px;"></i>
+                    <i x-show="show" data-lucide="eye-off" style="width: 20px; height: 20px;"></i>
+                </button>
+            </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" x-data="{ show: false }">
             <label>Konfirmasi PIN Baru</label>
-            <input type="password" class="form-input" x-model="securityForm.confirmPin" maxlength="6">
+            <div style="position: relative;">
+                <input :type="show ? 'text' : 'password'" class="form-input" x-model="securityForm.confirmPin" maxlength="6" style="padding-right: 50px;">
+                <button type="button" @click="show = !show" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer; color: var(--text-light); transition: all 0.2s; display: flex; align-items: center; justify-content: center;" :style="show ? 'color: var(--primary);' : ''">
+                    <i x-show="!show" data-lucide="eye" style="width: 20px; height: 20px;"></i>
+                    <i x-show="show" data-lucide="eye-off" style="width: 20px; height: 20px;"></i>
+                </button>
+            </div>
         </div>
         <button class="btn btn-primary" @click="handleChangePin" :disabled="loading">UPDATE PIN</button>
     </div>
