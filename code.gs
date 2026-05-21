@@ -48,24 +48,21 @@ function getDb() {
         sheet.appendRow(['ID', 'Timestamp', 'Nomor', 'Nama Pemilik', 'FileName', 'FileID', 'FileType', 'DeletedAt']);
       }
     } else if (name === CONFIG.SHEET_USERS) {
-      // Auto-migrate to the requested admin user (pemdesberbek4@gmail.com) and ensure credentials are correct
+      // Ensure the default admin user exists, but do NOT overwrite their credentials/settings if they already exist
       try {
         const data = sheet.getDataRange().getValues();
         let foundNewAdmin = false;
         for (let i = 1; i < data.length; i++) {
           if (data[i][0] === 'pemdesberbek4@gmail.com') {
             foundNewAdmin = true;
-            sheet.getRange(i + 1, 2).setValue('pemerintahdesaberbek4');
-            sheet.getRange(i + 1, 3).setValue('123456');
-            sheet.getRange(i + 1, 4).setValue('Desa Berbek');
-            sheet.getRange(i + 1, 5).setValue('Jl. Raya Berbek No. 1');
+            break;
           }
         }
         if (!foundNewAdmin) {
           sheet.appendRow(['pemdesberbek4@gmail.com', 'pemerintahdesaberbek4', '123456', 'Desa Berbek', 'Jl. Raya Berbek No. 1', '']);
         }
       } catch (err) {
-        console.warn('Gagal auto-update admin: ' + err.toString());
+        console.warn('Gagal check/create admin: ' + err.toString());
       }
     }
   });
@@ -360,19 +357,6 @@ function changePin(email, oldPin, newPin) {
   return { success: false, message: 'PIN lama salah' };
 }
 
-function changePassword(email, oldPass, newPass) {
-  const ss = getDb();
-  const sheet = ss.getSheetByName(CONFIG.SHEET_USERS);
-  const data = sheet.getDataRange().getValues();
-  
-  for (let i = 1; i < data.length; i++) {
-    if (data[i][0] === email && data[i][1] == oldPass) {
-      sheet.getRange(i + 1, 2).setValue(newPass);
-      return { success: true };
-    }
-  }
-  return { success: false, message: 'Password lama salah' };
-}
 
 /**
  * TRASH MANAGEMENT LOGIC
