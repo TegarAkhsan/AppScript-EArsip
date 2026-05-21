@@ -582,6 +582,46 @@ tr:hover td {
     opacity: 1;
 }
 
+/* Eye Visibility Toggle Button */
+.eye-toggle-container {
+    position: relative;
+    display: block;
+    width: 100%;
+}
+
+.eye-toggle-btn {
+    position: absolute !important;
+    right: 16px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    border: none !important;
+    background: transparent !important;
+    cursor: pointer !important;
+    color: var(--text-light) !important;
+    transition: color 0.2s ease, transform 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 8px !important;
+    z-index: 10 !important;
+    box-shadow: none !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+.eye-toggle-btn:hover {
+    color: var(--primary) !important;
+    transform: translateY(-50%) scale(1.1) !important;
+}
+
+.eye-toggle-btn.active {
+    color: var(--primary) !important;
+}
+
+.form-input-secure {
+    padding-right: 50px !important;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
     .content-area { padding: 0; }

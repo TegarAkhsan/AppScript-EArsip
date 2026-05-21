@@ -28,9 +28,9 @@
         </div>
         <div class="form-group" x-data="{ show: false }">
             <label>PIN Lama</label>
-            <div style="position: relative;">
-                <input :type="show ? 'text' : 'password'" class="form-input" x-model="securityForm.oldPin" maxlength="6" style="padding-right: 50px;">
-                <button type="button" @click="show = !show" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer; color: var(--text-light); transition: all 0.2s; display: flex; align-items: center; justify-content: center;" :style="show ? 'color: var(--primary);' : ''">
+            <div class="eye-toggle-container">
+                <input :type="show ? 'text' : 'password'" class="form-input form-input-secure" x-model="securityForm.oldPin" maxlength="6">
+                <button type="button" @click="show = !show" class="eye-toggle-btn" :class="show ? 'active' : ''">
                     <i x-show="!show" data-lucide="eye" style="width: 20px; height: 20px;"></i>
                     <i x-show="show" data-lucide="eye-off" style="width: 20px; height: 20px;"></i>
                 </button>
@@ -38,9 +38,9 @@
         </div>
         <div class="form-group" x-data="{ show: false }">
             <label>PIN Baru</label>
-            <div style="position: relative;">
-                <input :type="show ? 'text' : 'password'" class="form-input" x-model="securityForm.newPin" maxlength="6" style="padding-right: 50px;">
-                <button type="button" @click="show = !show" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer; color: var(--text-light); transition: all 0.2s; display: flex; align-items: center; justify-content: center;" :style="show ? 'color: var(--primary);' : ''">
+            <div class="eye-toggle-container">
+                <input :type="show ? 'text' : 'password'" class="form-input form-input-secure" x-model="securityForm.newPin" maxlength="6">
+                <button type="button" @click="show = !show" class="eye-toggle-btn" :class="show ? 'active' : ''">
                     <i x-show="!show" data-lucide="eye" style="width: 20px; height: 20px;"></i>
                     <i x-show="show" data-lucide="eye-off" style="width: 20px; height: 20px;"></i>
                 </button>
@@ -48,9 +48,9 @@
         </div>
         <div class="form-group" x-data="{ show: false }">
             <label>Konfirmasi PIN Baru</label>
-            <div style="position: relative;">
-                <input :type="show ? 'text' : 'password'" class="form-input" x-model="securityForm.confirmPin" maxlength="6" style="padding-right: 50px;">
-                <button type="button" @click="show = !show" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer; color: var(--text-light); transition: all 0.2s; display: flex; align-items: center; justify-content: center;" :style="show ? 'color: var(--primary);' : ''">
+            <div class="eye-toggle-container">
+                <input :type="show ? 'text' : 'password'" class="form-input form-input-secure" x-model="securityForm.confirmPin" maxlength="6">
+                <button type="button" @click="show = !show" class="eye-toggle-btn" :class="show ? 'active' : ''">
                     <i x-show="!show" data-lucide="eye" style="width: 20px; height: 20px;"></i>
                     <i x-show="show" data-lucide="eye-off" style="width: 20px; height: 20px;"></i>
                 </button>
