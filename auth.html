@@ -16,25 +16,20 @@
             <p style="font-weight: 500; color: var(--primary);">Akses Sistem Digital</p>
         </div>
         
-        <form @submit.prevent="handlePinVerify" x-data="{ showPin: false }">
+        <form @submit.prevent="handlePinVerify">
             <div class="form-group" style="text-align: center; position: relative; margin-bottom: 32px;">
                 <div style="display: flex; gap: 12px; justify-content: center; align-items: center; margin-bottom: 24px; position: relative;">
                     <div style="display: flex; gap: 12px; justify-content: center; width: 100%;" @click="$refs.pinInput.focus()">
-                        <div class="pin-box" :class="authForm.pinInput.length >= 1 ? 'active' : ''" x-text="authForm.pinInput[0] ? (showPin ? authForm.pinInput[0] : '●') : ''"></div>
-                        <div class="pin-box" :class="authForm.pinInput.length >= 2 ? 'active' : ''" x-text="authForm.pinInput[1] ? (showPin ? authForm.pinInput[1] : '●') : ''"></div>
-                        <div class="pin-box" :class="authForm.pinInput.length >= 3 ? 'active' : ''" x-text="authForm.pinInput[2] ? (showPin ? authForm.pinInput[2] : '●') : ''"></div>
-                        <div class="pin-box" :class="authForm.pinInput.length >= 4 ? 'active' : ''" x-text="authForm.pinInput[3] ? (showPin ? authForm.pinInput[3] : '●') : ''"></div>
-                        <div class="pin-box" :class="authForm.pinInput.length >= 5 ? 'active' : ''" x-text="authForm.pinInput[4] ? (showPin ? authForm.pinInput[4] : '●') : ''"></div>
-                        <div class="pin-box" :class="authForm.pinInput.length >= 6 ? 'active' : ''" x-text="authForm.pinInput[5] ? (showPin ? authForm.pinInput[5] : '●') : ''"></div>
+                        <div class="pin-box" :class="authForm.pinInput.length >= 1 ? 'active' : ''" x-text="authForm.pinInput[0] ? '●' : ''"></div>
+                        <div class="pin-box" :class="authForm.pinInput.length >= 2 ? 'active' : ''" x-text="authForm.pinInput[1] ? '●' : ''"></div>
+                        <div class="pin-box" :class="authForm.pinInput.length >= 3 ? 'active' : ''" x-text="authForm.pinInput[2] ? '●' : ''"></div>
+                        <div class="pin-box" :class="authForm.pinInput.length >= 4 ? 'active' : ''" x-text="authForm.pinInput[3] ? '●' : ''"></div>
+                        <div class="pin-box" :class="authForm.pinInput.length >= 5 ? 'active' : ''" x-text="authForm.pinInput[4] ? '●' : ''"></div>
+                        <div class="pin-box" :class="authForm.pinInput.length >= 6 ? 'active' : ''" x-text="authForm.pinInput[5] ? '●' : ''"></div>
                     </div>
-                    
-                    <button type="button" @click.stop="showPin = !showPin" style="position: absolute; right: 0; border: none; background: transparent; cursor: pointer; color: var(--text-light); transition: all 0.2s; display: flex; align-items: center; justify-content: center; z-index: 20; padding: 8px;" :style="showPin ? 'color: var(--primary);' : ''">
-                        <i x-show="!showPin" data-lucide="eye" style="width: 22px; height: 22px;"></i>
-                        <i x-show="showPin" data-lucide="eye-off" style="width: 22px; height: 22px;"></i>
-                    </button>
                 </div>
                 
-                <input :type="showPin ? 'text' : 'password'" 
+                <input type="password" 
                        x-ref="pinInput"
                        maxlength="6" 
                        x-model="authForm.pinInput" 
